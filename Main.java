@@ -30,47 +30,35 @@ public class Main extends Application {
 		try {
 		    window = primaryStage;
 		    window.setTitle("Food Query and Meal Analysis");
-		    
+
 		    foodListView = new ListView<>();
 		    foodListView.getItems().addAll("Banana", "Burger", "Lamb's Eye", "Pizza", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q");
 		    foodListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-		    
+
 		    mealListView = new ListView<>();
-            mealListView.getItems().addAll("Burger");
-            mealListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-		    
+		    mealListView.getItems().addAll("Burger");
+		    mealListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
 		    Button button1 = new Button("Button Number 1");
 		    Button button2 = new Button("Button Number 2");
 		    Button button3 = new Button("Button Number 3");
 
 		    FlowPane flowPane = new FlowPane();
-		    
+
 		    flowPane.setOrientation(Orientation.VERTICAL);
 		    flowPane.setVgap(10);
 
 		    flowPane.getChildren().add(button1);
 		    flowPane.getChildren().add(button2);
 		    flowPane.getChildren().add(button3);
-		    
-		    
-		    GridPane root = new GridPane();
-		    
-	        root.setPadding(new Insets(20));
-	        root.setHgap(25);
-	        root.setVgap(15);
-	 
-	        Label labelTitle = new Label("Enter your user name and password!");
- 
-	        // Put on cell (0,0), span 2 column, 1 row.
-	        root.add(labelTitle, 0, 0, 2, 1);
-	        
-            /*HBox layout = new HBox(10);
-            layout.setPadding(new Insets(20, 20, 20, 20));
-            layout.getChildren().addAll(flowPane, foodListView, mealListView);*/
-    
-            scene = new Scene(root, 1000, 500);
-            window.setScene(scene);
-            window.show();
+
+		    HBox layout = new HBox(10);
+		    layout.setPadding(new Insets(20, 20, 20, 20));
+		    layout.getChildren().addAll(flowPane, foodListView, mealListView);
+
+		    scene = new Scene(layout, 1000, 500);
+		    window.setScene(scene);
+		    window.show();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
