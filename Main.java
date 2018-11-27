@@ -28,37 +28,58 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-		    window = primaryStage;
-		    window.setTitle("Food Query and Meal Analysis");
+			window = primaryStage;
+			window.setTitle("Food Query and Meal Analysis");
 
-		    foodListView = new ListView<>();
-		    foodListView.getItems().addAll("Banana", "Burger", "Lamb's Eye", "Pizza", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q");
-		    foodListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+			foodListView = new ListView<>();
+			foodListView.getItems().addAll("Banana", "Burger", "Lamb's Eye", "Pizza", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q");
+			foodListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-		    mealListView = new ListView<>();
-		    mealListView.getItems().addAll("Burger");
-		    mealListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+			mealListView = new ListView<>();
+			mealListView.getItems().addAll("Burger");
+			mealListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-		    Button button1 = new Button("Button Number 1");
-		    Button button2 = new Button("Button Number 2");
-		    Button button3 = new Button("Button Number 3");
+			Button button1 = new Button("Button Number 1");
+			Button button2 = new Button("Button Number 2");
+			Button button3 = new Button("Button Number 3");
 
-		    FlowPane flowPane = new FlowPane();
+			FlowPane flowPane = new FlowPane();
 
-		    flowPane.setOrientation(Orientation.VERTICAL);
-		    flowPane.setVgap(10);
+			flowPane.setOrientation(Orientation.VERTICAL);
+			flowPane.setVgap(10);
 
-		    flowPane.getChildren().add(button1);
-		    flowPane.getChildren().add(button2);
-		    flowPane.getChildren().add(button3);
+			flowPane.getChildren().add(button1);
+			flowPane.getChildren().add(button2);
+			flowPane.getChildren().add(button3);
 
-		    HBox layout = new HBox(10);
-		    layout.setPadding(new Insets(20, 20, 20, 20));
-		    layout.getChildren().addAll(flowPane, foodListView, mealListView);
 
-		    scene = new Scene(layout, 1000, 500);
-		    window.setScene(scene);
-		    window.show();
+			GridPane root = new GridPane();
+
+			root.setPadding(new Insets(20));
+			root.setHgap(25);
+			root.setVgap(15);
+
+			Label labelTitle = new Label("Button Stuff");
+			Label foodListTitle = new Label("Food List");
+			Label mealListTitle = new Label("Meal List");
+
+			Button addToMealButt = new Button("Add To Meal");
+			Button analyzeMealButt = new Button("Analyze Meal");
+
+			root.add(labelTitle, 0, 0);
+			root.add(flowPane, 0, 1);
+
+			root.add(foodListTitle, 1, 0, 1, 1);
+			root.add(foodListView, 1, 1, 2, 1);
+			root.add(addToMealButt, 2, 0);
+
+			root.add(mealListTitle, 3, 0, 1, 1);
+			root.add(mealListView, 3, 1, 2, 1);
+			root.add(analyzeMealButt, 4, 0);
+
+			scene = new Scene(root, 1000, 500);
+			window.setScene(scene);
+			window.show();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
