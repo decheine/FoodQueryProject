@@ -1,5 +1,5 @@
-package application;
-    
+import java.io.IOException;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -24,6 +24,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.event.ActionEvent; 
+import javafx.event.EventHandler;
 
 /**
  * Creates the basic GUI for Food Query and Meal Analysis
@@ -36,6 +38,9 @@ public class Main extends Application {
     Scene scene; // the main GUI scene
     ListView<HBox> foodListView; // visible list of food items
     ListView<HBox> mealListView; // visible list of food items added to meal
+    String fileName=""; // temp variable just to for filler file name
+    FoodData foodData = new FoodData();
+    FoodItem foodItem = new FoodItem();
     
     /**
      * Creates the left portion of the GUI window.
@@ -54,6 +59,21 @@ public class Main extends Application {
         
         Button loadList = new Button("Load New Food List");
         
+        //loadList event handler
+        EventHandler<ActionEvent> loadEvent = new EventHandler<ActionEvent>() { 
+            public void handle(ActionEvent e) 
+            { 
+               
+                try {
+					foodData.loadFoodItems(fileName);
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+            } 
+        }; 
+        loadList.setOnAction(loadEvent);
+        
+        
         TextField csvFileInput = new TextField();
         csvFileInput.setPromptText("<file name>.csv");
         
@@ -63,7 +83,25 @@ public class Main extends Application {
         
         // menu buttons for functionality
         Button saveList = new Button("Save Food List");
+        
+        
+        EventHandler<ActionEvent> saveEvent = new EventHandler<ActionEvent>() { 
+            public void handle(ActionEvent e) 
+            { 
+                
+               foodData.saveFoodItems(fileName);
+            } 
+        }; 
+        
+        
+        loadList.setOnAction(loadEvent);
+        loadList.setOnAction(saveEvent);
+        
+        
+        
         Button addFoodItem = new Button("Add New Food Item");
+        
+             
         Button showAllFoodItems = new Button("Show All Food Items (Reset Filters)");
         
         // for spacing out items
@@ -280,7 +318,16 @@ public class Main extends Application {
             Label counter = new Label("Number of Items: 6");
             
             Button addToMealButt = new Button("Add Selected To Meal");
-            
+             //unsure on how to add multiple checked food Items              
+            EventHandler<ActionEvent> addToMealEvent = new EventHandler<ActionEvent>() { 
+                public void handle(ActionEvent e) 
+                { 
+                    
+                   foodItem.addInAMeal();
+                } 
+            }; 
+            addToMealButt.setOnAction(addToMealEvent);
+                        
             // meal list labels and buttons
             Label mealListTitle = new Label("Meal List");
             mealListTitle.setFont(Font.font("Arial", FontWeight.BOLD, 20));
@@ -289,6 +336,16 @@ public class Main extends Application {
             Button analyzeMealButt = new Button("Analyze Meal");
             Button removeFromMealButt = new Button("Remove Selected From Meal");
 
+            EventHandler<ActionEvent> removeFromMealEvent = new EventHandler<ActionEvent>() { 
+                public void handle(ActionEvent e) 
+                { 
+                 // if(cb1.isSelected())
+                   foodItem.removeInAMeal();
+                } 
+            }; 
+            removeFromMealButt.setOnAction(removeFromMealEvent);
+            
+            
             
             root.add(labelTitle, 0, 0);
 
