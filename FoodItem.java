@@ -12,7 +12,10 @@ public class FoodItem {
     private String ID; // Foods unique ID
     private HashMap<String, Double> Nutrients; // a hashmap containing nutrient value pairs
     private boolean InAMeal; // Boolean to tell if in a meal;
-
+    
+    FoodItem(){
+    	
+    }
     FoodItem(String name, String id, HashMap<String, Double> nutrients, boolean inAMeal) {
         this.Name = name;
         this.ID = id;
