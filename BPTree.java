@@ -8,6 +8,17 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 
+/*
+ * TODO:
+ * 1. Double check Node insert and split methods
+ *    a. floor.(length / 2) correct for retrieving median key?
+ *    b. Splitting correctly?
+ *    c. Inserting in the right spot?
+ *    d. Is using Collections.binarySearch ok? Does the index it returns work?
+ * 2. Implement unimplemented methods
+ * 3. Test
+ */
+
 /**
  * Implementation of a B+ tree to allow efficient access to
  * many different indexes of a large data set. 
@@ -61,39 +72,71 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
             
             return;
         }
+        else {
+            insertHelper(key, value, root);
+            
+            if(root.isOverflow()) {
+                InternalNode newRoot = new InternalNode();
+                
+                int rootLength = root.keys.size();
+                
+                // adds median key of old root to new root
+                newRoot.keys.add(root.keys.get((int) Math.floor(rootLength / 2)));
+                
+                // adds old root to left side
+                newRoot.children.add(root);
+                
+                // splits old root and adds its new sibling to its right side
+                newRoot.children.add(root.split());
+                
+                root = newRoot;
+            }
+        }
         
-        //insertHelper(key, value, root);
-
         // TODO : Complete
     }
     
-    /*private Node insertHelper(K key, V value, Node node) {
+    /**
+     * Recursive helper method for insert. Traverses the tree until it finds the correct leaf node
+     * for the key/value pair to be inserted into. Then on the recursive calls it checks if each
+     * node in the path is overflown or not. If it is, it splits it and passes up its median value 
+     * to its parent.
+     * 
+     * @param key
+     * @param value
+     * @param node
+     */
+    private void insertHelper(K key, V value, Node node) {
+        // TODO: test this a ton
+        
         int index = Collections.binarySearch(node.keys, key); // TODO: allowed to use this?
         
-        if(index < 0) { // Collections.binarySearch returns (-index - 1) when key is not in list and index is where the key would have been
+        if(index < 0) { // Collections.binarySearch returns (-index - 1) when key is not in list 
+                        // and index is where the key would have been
             index = ((-1 * index) - 1);
         }
-        
+
         if(node instanceof BPTree.InternalNode) {
-            insertHelper(key, value, (Node) ((BPTree.InternalNode) node).children.get(index));
+            InternalNode iNode = (InternalNode) node;
+            Node childNode = iNode.children.get(index);
+            
+            insertHelper(key, value, childNode);
+            
+            if(childNode.isOverflow()) {
+                int childLength = root.keys.size();
+                
+                // retrieves median key value and adds it to the appropriate index
+                iNode.keys.add(index, childNode.keys.get((int) Math.floor(childLength / 2)));
+                
+                // adds a reference to the right child of the newly added key in the step above
+                iNode.children.add(index, childNode.split());
+            }
+            
         }
         else {
-            LeafNode node2 = (LeafNode) node;
-            
             node.insert(key, value);
-            
-            if(node2.isOverflow()) {
-                LeafNode node3 = new LeafNode();
-                node3.keys = node2.keys;
-                node3.values = node2.values;
-                node3.previous = node2.previous;
-                node3.next = node2;
-                
-                return node2.split();
-            }
         }
-    }*/
-    
+    }
     
     /*
      * (non-Javadoc)
@@ -217,7 +260,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
     private class InternalNode extends Node {
 
         // List of children nodes
-        List<Node> children; // i is left child of keys at i and i+1 is its right child
+        List<Node> children; // index is left child of key at index and index + 1 is its right child
         
         /**
          * Package constructor
@@ -277,13 +320,30 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
             }
             
             children.get(index).insert(key, value);
+            
+            
+            // TODO: ignore this for now but either delete or implement eventually
+            /*// checks if node that was inserted into has a number of keys >= branching factor
+            if(children.get(index).isOverflow()) {
+                int childLength = children.get(index).keys.size();
+                
+                keys.add(index, children.get(index).keys.get((int) Math.floor(((childLength / 2))));
+                
+                
+                Node newChild = children.get(index).split(); // TODO: check that
+                                                             // children.get(index) is now only
+                                                             // the left side of the original node
+                
+                keys.add(index, newChild.keys.get(0)); // add key that is "passed up"
+                children.add(index + 1, newChild); // child to the right of the "passed up" key
+            }*/
         }
         
         /**
          * Splits the node into two new nodes (a node to the left of the parent and a node to the 
          * right of the parent), giving the left node all keys and children whose index is 
-         * < floor.((this.keys.size + 1)/2) and giving the right node all of the keys and children
-         * whose index is >= floor.((this.keys.size + 1)/2).
+         * < floor.(this.keys.size / 2) and giving the right node all of the keys and children
+         * whose index is >= floor.(this.keys.size / 2).
          * The current node is then set to the left node while the right node is returned.
          * 
          * (non-Javadoc)
@@ -299,15 +359,15 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
             InternalNode leftSibNode = new InternalNode(); // the node on the left side of the 
                                                            // parent of the current node
             
-            int midFloor = (int) Math.floor(((length + 1) / 2));
+            int midFloor = (int) Math.floor(length / 2);
             
             for(int i = 0; i < length; ++i) {
-                if(i < midFloor) { // leftSibNode has floor.((length + 1)/2) keys
+                if(i < midFloor) { // leftSibNode has floor.(length / 2) keys
                                    // (e.g. if length == 5, leftSibNode has 2 keys)
                     leftSibNode.keys.add(this.keys.get(i));
                     leftSibNode.children.add(this.children.get(i));
                 }
-                else if(i >= midFloor) { // rightSibNode has ceiling.((length + 1)/2) keys
+                else if(i >= midFloor) { // rightSibNode has ceiling.(length / 2) keys
                                          // (e.g. if length == 5, rightSibNode has 3 keys
                     rightSibNode.keys.add(this.keys.get(i));
                     rightSibNode.children.add(this.children.get(i));
@@ -449,7 +509,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#insert(Comparable, Object)
          */
         void insert(K key, V value) {
-            // TODO: test
+            // TODO: test (test if when index is outside of current indices it still returns correctly)
             
             int index = Collections.binarySearch(this.keys, key); // TODO: allowed to use this?
             
@@ -466,11 +526,13 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         /**
          * Splits the node into two new nodes (a node to the left of the parent and a node to the 
          * right of the parent), giving the left node all key/value pairs whose index is 
-         * < floor.((this.keys.size + 1)/2) and giving the right node all of the key/value pairs 
-         * whose index is >= floor.((this.keys.size + 1)/2).
+         * < floor.(this.keys.size / 2) and giving the right node all of the key/value pairs 
+         * whose index is >= floor.(this.keys.size / 2).
          * The current node is then set to the left node while the right node is returned.
          * Also sets this node's next value to the new right node and sets the new right node's
          * previous value to this node.
+         * Is called AFTER a value has been inserted (i.e. the number of key/value pairs is greater
+         * than or equal to the branching factor)
          * 
          * (non-Javadoc)
          * @see BPTree.Node#split()
@@ -485,17 +547,27 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
             LeafNode leftSibNode = new LeafNode(); // the node on the left side of the parent of the 
                                                    // current node
             
-            int midFloor = (int) Math.floor(((length + 1) / 2));
+            int midFloor = (int) Math.floor(length / 2);
             
             for(int i = 0; i < length; ++i) {
-                if(i < midFloor) { // leftSibNode has floor.((length + 1)/2) key/value pairs
+                if(i < midFloor) { // leftSibNode has floor.(length / 2) key/value pairs
                                    // (e.g. if length == 5, leftSibNode has 2 key/value pairs)
-                    leftSibNode.insert(this.keys.get(i), this.values.get(i));
+                    
+                    // TODO: insert take up too much time?
+                    // leftSibNode.insert(this.keys.get(i), this.values.get(i));
+                    
+                    leftSibNode.keys.add(this.keys.get(i));
+                    leftSibNode.values.add(this.values.get(i));
                 }
-                else if(i >= midFloor) { // rightSibNode has ceiling.((length + 1)/2) key/value 
+                else if(i >= midFloor) { // rightSibNode has ceiling.(length / 2) key/value 
                                          // pairs (e.g. if length == 5, rightSibNode has 3 key/value 
                                          // pairs)
-                    rightSibNode.insert(this.keys.get(i), this.values.get(i));
+                    
+                    // TODO: insert take up too much time?
+                    // rightSibNode.insert(this.keys.get(i), this.values.get(i));
+                    
+                    rightSibNode.keys.add(this.keys.get(i));
+                    rightSibNode.values.add(this.values.get(i));
                 }
             }
 
