@@ -15,8 +15,10 @@ import java.util.Random;
  *    b. Splitting correctly?
  *    c. Inserting in the right spot?
  *    d. Is using Collections.binarySearch ok? Does the index it returns work?
- * 2. Implement unimplemented methods
- * 3. Test
+ *    e. TODO: should internal nodes keep value passed up or not???
+ * 2. What does getFirstLeafKey do?
+ * 3. Implement unimplemented methods
+ * 4. Test
  */
 
 /**
@@ -123,13 +125,13 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
             insertHelper(key, value, childNode);
             
             if(childNode.isOverflow()) {
-                int childLength = root.keys.size();
+                int childLength = childNode.keys.size();
                 
                 // retrieves median key value and adds it to the appropriate index
                 iNode.keys.add(index, childNode.keys.get((int) Math.floor(childLength / 2)));
                 
                 // adds a reference to the right child of the newly added key in the step above
-                iNode.children.add(index, childNode.split());
+                iNode.children.add(index + 1, childNode.split()); // TODO: check if right index
             }
             
         }
@@ -283,16 +285,14 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         }
         
         /**
-         * Returns true if the number of keys in the node after an insertion would be greater than 
-         * or equal to the branching factor. False otherwise.
+         * Returns true if the number of keys in the node is greater than or equal to the branching 
+         * factor. False otherwise.
          * 
          * (non-Javadoc)
          * @see BPTree.Node#isOverflow()
          */
         boolean isOverflow() {
-            // TODO: test (should it anticipate an insertion or not?)
-            
-            if((this.keys.size() + 1) >= branchingFactor) {
+            if(this.keys.size() >= branchingFactor) {
                 return true;
             }
             
@@ -309,9 +309,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         void insert(K key, V value) {
             // TODO: test
             
-            int index = Collections.binarySearch(this.keys, key); // TODO: allowed to use this?, 
-                                                                  // double check that inserts at 
-                                                                  // i+1 for right children
+            int index = Collections.binarySearch(this.keys, key); // TODO: allowed to use this?
             
             // Collections.binarySearch returns (-index - 1) when key is not in list and index is 
             // where the key would have been
@@ -320,23 +318,6 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
             }
             
             children.get(index).insert(key, value);
-            
-            
-            // TODO: ignore this for now but either delete or implement eventually
-            /*// checks if node that was inserted into has a number of keys >= branching factor
-            if(children.get(index).isOverflow()) {
-                int childLength = children.get(index).keys.size();
-                
-                keys.add(index, children.get(index).keys.get((int) Math.floor(((childLength / 2))));
-                
-                
-                Node newChild = children.get(index).split(); // TODO: check that
-                                                             // children.get(index) is now only
-                                                             // the left side of the original node
-                
-                keys.add(index, newChild.keys.get(0)); // add key that is "passed up"
-                children.add(index + 1, newChild); // child to the right of the "passed up" key
-            }*/
         }
         
         /**
@@ -367,8 +348,10 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
                     leftSibNode.keys.add(this.keys.get(i));
                     leftSibNode.children.add(this.children.get(i));
                 }
-                else if(i >= midFloor) { // rightSibNode has ceiling.(length / 2) keys
-                                         // (e.g. if length == 5, rightSibNode has 3 keys
+                //else if(i >= midFloor) { TODO: does internal keep median key or not??? 
+                
+                else if(i > midFloor) { // rightSibNode has ceiling.(length / 2) keys
+                                        // (e.g. if length == 5, rightSibNode has 3 keys
                     rightSibNode.keys.add(this.keys.get(i));
                     rightSibNode.children.add(this.children.get(i));
                 }
@@ -378,7 +361,6 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
             this.keys = leftSibNode.keys;
             this.children = leftSibNode.children;
 
-            
             return rightSibNode;
         }
         
@@ -470,30 +452,18 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
             // TODO: test (should we be returning first key of this leaf, or first key of first leaf
             // of this tree?
             
-            if(previous == null) {
-                return keys.get(0);
-            }
-            
-            LeafNode prev = previous;
-            
-            while(prev.previous != null) {
-                prev = prev.previous;
-            }
-
-            return prev.keys.get(0);
+            return keys.get(0);
         }
         
         /**
-         * Returns true if the number of keys in the node after an insertion would be greater than 
-         * or equal to the branching factor. False otherwise.
+         * Returns true if the number of keys in the node is greater than or equal to the branching 
+         * factor. False otherwise.
          * 
          * (non-Javadoc)
          * @see BPTree.Node#isOverflow()
          */
         boolean isOverflow() {
-            // TODO: test (should it anticipate an insertion or not?)
-            
-            if((this.keys.size() + 1) >= branchingFactor) {
+            if(keys.size() >= branchingFactor) {
                 return true;
             }
             
@@ -552,10 +522,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
             for(int i = 0; i < length; ++i) {
                 if(i < midFloor) { // leftSibNode has floor.(length / 2) key/value pairs
                                    // (e.g. if length == 5, leftSibNode has 2 key/value pairs)
-                    
-                    // TODO: insert take up too much time?
-                    // leftSibNode.insert(this.keys.get(i), this.values.get(i));
-                    
+
                     leftSibNode.keys.add(this.keys.get(i));
                     leftSibNode.values.add(this.values.get(i));
                 }
