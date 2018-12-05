@@ -90,7 +90,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
                 
                 // splits old root and adds its new sibling to its right side
                 newRoot.children.add(root.split());
-                
+
                 root = newRoot;
             }
         }
@@ -150,10 +150,13 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
             !comparator.contentEquals("==") && 
             !comparator.contentEquals("<=") )
             return new ArrayList<V>();
-        // TODO : Complete
-        return null;
+        
+        ArrayList<V> rangeList = new ArrayList<V>();
+        
+        rangeList.addAll(root.rangeSearch(key, comparator));
+
+        return rangeList;
     }
-    
     
     /*
      * (non-Javadoc)
@@ -269,6 +272,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          */
         InternalNode() {
             super();
+            keys = new ArrayList<K>();
             children = new ArrayList<Node>();
         }
         
@@ -348,12 +352,17 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
                     leftSibNode.keys.add(this.keys.get(i));
                     leftSibNode.children.add(this.children.get(i));
                 }
-                //else if(i >= midFloor) { TODO: does internal keep median key or not??? 
-                
-                else if(i > midFloor) { // rightSibNode has ceiling.(length / 2) keys
+                else if(i == midFloor) { // TODO: does internal keep median key or not??? 
+                    leftSibNode.children.add(this.children.get(i));
+                }
+                else if(i >= midFloor) { // rightSibNode has ceiling.(length / 2) keys
                                         // (e.g. if length == 5, rightSibNode has 3 keys
                     rightSibNode.keys.add(this.keys.get(i));
                     rightSibNode.children.add(this.children.get(i));
+                }
+                
+                if(i == (length - 1)) {
+                    rightSibNode.children.add(this.children.get(i + 1));
                 }
             }
 
@@ -373,43 +382,94 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          */
         List<V> rangeSearch(K key, String comparator) {
             // TODO : Test (only this node's values?)
+            
             List<V> rangeList = new ArrayList<V>();
             
-            for(int i = 0; i < keys.size(); ++i) {
+            switch (comparator) {
+                case "<=":
+                    rangeList.addAll(children.get(0).rangeSearch(key, comparator));
+                    break;
+                    
+                case ">=":
+                    for(int i = 0; i < keys.size(); ++i) {
+                        if(keys.get(i).compareTo(key) < 0) {
+                            if(i == (keys.size() - 1)) {
+                                rangeList.addAll(children.get(i).rangeSearch(key, comparator));
+                                break;
+                            }
+                            else{
+                                continue;
+                            }
+                        }
+                        else if(keys.get(i).compareTo(key) >= 0) {
+                            rangeList.addAll(children.get(i).rangeSearch(key, comparator));
+                            break;
+                        }
+                    }
+                    break;
+                    
+                case "==":
+                    for(int i = 0; i < keys.size(); ++i) {
+                        if(keys.get(i).compareTo(key) < 0) {
+                            if(i == (keys.size() - 1)) {
+                                rangeList.addAll(children.get(i).rangeSearch(key, comparator));
+                                break;
+                            }
+                            else{
+                                continue;
+                            }
+                        }
+                        else if(keys.get(i).compareTo(key) == 0) {
+                            rangeList.addAll(children.get(i).rangeSearch(key, comparator));
+                            break;
+                        }
+                        else if(keys.get(i).compareTo(key) > 0) {
+                            if(i != 0) {
+                                rangeList.addAll(children.get(i - 1).rangeSearch(key, comparator));
+                                break;
+                            }
+                            else {
+                                rangeList.addAll(children.get(i).rangeSearch(key, comparator));
+                                break;
+                            }
+                        }
+                    }
+                    break;
+            }
+            
+            return rangeList;
+            /*boolean foundRightKey = false;
+            
+            for(int i = 0; i < keys.size(); ++i) { // children length = keys length + 1
                 switch (comparator) {
                     case "<=":
                         if(keys.get(i).compareTo(key) <= 0) {
                             rangeList.addAll(children.get(i).rangeSearch(key, comparator));
+                            foundRightKey = true;
                         }
                         break;
                         
-                    case "<":
-                        if(keys.get(i).compareTo(key) < 0) {
-                            rangeList.addAll(children.get(i).rangeSearch(key, comparator));
-                        }
-                        break;
-
                     case ">=":
                         if(keys.get(i).compareTo(key) >= 0) {
                             rangeList.addAll(children.get(i).rangeSearch(key, comparator));
-                        }
-                        break;
-                        
-                    case ">":
-                        if(keys.get(i).compareTo(key) > 0) {
-                            rangeList.addAll(children.get(i).rangeSearch(key, comparator));
+                            foundRightKey = true;
                         }
                         break;
                         
                     case "==":
                         if(keys.get(i).compareTo(key) == 0) {
                             rangeList.addAll(children.get(i).rangeSearch(key, comparator));
+                            foundRightKey = true;
                         }
                         break;
                 }
+                
+                if(foundRightKey) {
+                    break;
+                }
             }
             
-            return rangeList;
+            return rangeList;*/
         }
     
     } // End of class InternalNode
@@ -439,6 +499,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          */
         LeafNode() {
             super();
+            keys = new ArrayList<K>();
             values = new ArrayList<V>();
             previous = null;
             next = null;
@@ -481,16 +542,22 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         void insert(K key, V value) {
             // TODO: test (test if when index is outside of current indices it still returns correctly)
             
-            int index = Collections.binarySearch(this.keys, key); // TODO: allowed to use this?
-            
-            // Collections.binarySearch returns (-index - 1) when key is not in list and index is 
-            // where the key would have been
-            if(index < 0) { 
-                index = ((-1 * index) - 1);
+            if(keys.size() > 0) {
+                int index = Collections.binarySearch(this.keys, key); // TODO: allowed to use this?
+                
+                // Collections.binarySearch returns (-index - 1) when key is not in list and index is 
+                // where the key would have been
+                if(index < 0) { 
+                    index = ((-1 * index) - 1);
+                }
+                
+                this.keys.add(index, key);
+                this.values.add(index, value);
             }
-            
-            this.keys.add(index, key);
-            this.values.add(index, value);
+            else {
+                this.keys.add(key);
+                this.values.add(value);
+            }
         }
         
         /**
@@ -529,10 +596,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
                 else if(i >= midFloor) { // rightSibNode has ceiling.(length / 2) key/value 
                                          // pairs (e.g. if length == 5, rightSibNode has 3 key/value 
                                          // pairs)
-                    
-                    // TODO: insert take up too much time?
-                    // rightSibNode.insert(this.keys.get(i), this.values.get(i));
-                    
+
                     rightSibNode.keys.add(this.keys.get(i));
                     rightSibNode.values.add(this.values.get(i));
                 }
@@ -557,6 +621,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          */
         List<V> rangeSearch(K key, String comparator) {
             // TODO : Test (only this node's values?)
+            
             List<V> rangeList = new ArrayList<V>();
             
             for(int i = 0; i < keys.size(); ++i) {
@@ -567,20 +632,8 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
                         }
                         break;
                         
-                    case "<":
-                        if(keys.get(i).compareTo(key) < 0) {
-                            rangeList.add(values.get(i));
-                        }
-                        break;
-
                     case ">=":
                         if(keys.get(i).compareTo(key) >= 0) {
-                            rangeList.add(values.get(i));
-                        }
-                        break;
-                        
-                    case ">":
-                        if(keys.get(i).compareTo(key) > 0) {
                             rangeList.add(values.get(i));
                         }
                         break;
@@ -588,6 +641,28 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
                     case "==":
                         if(keys.get(i).compareTo(key) == 0) {
                             rangeList.add(values.get(i));
+                        }
+                        break;
+                }
+            }
+            
+            if(next != null && next.keys != null && next.keys.size() >= 1) {
+                switch (comparator) {
+                    case "<=":
+                        if(previous.keys.get(0).compareTo(key) <= 0) {
+                            rangeList.addAll(previous.rangeSearch(key, comparator));
+                        }
+                        break;
+                        
+                    case ">=":
+                        if(previous.keys.get(0).compareTo(key) >= 0) {
+                            rangeList.addAll(previous.rangeSearch(key, comparator));
+                        }
+                        break;
+                        
+                    case "==":
+                        if(previous.keys.get(0).compareTo(key) == 0) {
+                            rangeList.addAll(previous.rangeSearch(key, comparator));
                         }
                         break;
                 }
