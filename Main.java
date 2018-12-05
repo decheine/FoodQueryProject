@@ -95,14 +95,30 @@ public class Main extends Application {
         
         
         loadList.setOnAction(loadEvent);
-        loadList.setOnAction(saveEvent);
+        saveList.setOnAction(saveEvent);
         
         
         
         Button addFoodItem = new Button("Add New Food Item");
+        EventHandler<ActionEvent> addFoodItemEvent = new EventHandler<ActionEvent>() { 
+            public void handle(ActionEvent e) 
+            { 
+                
+               //todo
+            } 
+        }; 
         
              
         Button showAllFoodItems = new Button("Show All Food Items (Reset Filters)");
+        EventHandler<ActionEvent> showAllFoodItemsEvent = new EventHandler<ActionEvent>() { 
+            public void handle(ActionEvent e) 
+            { 
+                
+             //todo
+            } 
+        }; 
+       addFoodItem.setOnAction(addFoodItemEvent);
+        showAllFoodItems.setOnAction(showAllFoodItemsEvent);
         
         // for spacing out items
         Label spacer0 = new Label("");
@@ -132,6 +148,14 @@ public class Main extends Application {
         
         // applies both kinds of filters
         Button applyQueryButt = new Button("Apply Query");
+        EventHandler<ActionEvent> applyQueryEvent = new EventHandler<ActionEvent>() { 
+            public void handle(ActionEvent e) 
+            { 
+                
+               
+            } 
+        }; 
+        applyQueryButt.setOnAction(applyQueryEvent);
         
         // for spacing out the different sections
         Label spacer = new Label("");
@@ -334,6 +358,17 @@ public class Main extends Application {
             Label counter2 = new Label("Number of Items: 2");
 
             Button analyzeMealButt = new Button("Analyze Meal");
+            EventHandler<ActionEvent>analyzeMealEvent = new EventHandler<ActionEvent>() { 
+                public void handle(ActionEvent e) 
+                { 
+                    
+                  
+                } 
+            }; 
+            analyzeMealButt.setOnAction(analyzeMealEvent);
+            
+            
+            
             Button removeFromMealButt = new Button("Remove Selected From Meal");
 
             EventHandler<ActionEvent> removeFromMealEvent = new EventHandler<ActionEvent>() { 
