@@ -8,19 +8,6 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 
-/*
- * TODO:
- * 1. Double check Node insert and split methods
- *    a. floor.(length / 2) correct for retrieving median key?
- *    b. Splitting correctly?
- *    c. Inserting in the right spot?
- *    d. Is using Collections.binarySearch ok? Does the index it returns work?
- *    e. TODO: should internal nodes keep value passed up or not???
- * 2. What does getFirstLeafKey do?
- * 3. Implement unimplemented methods
- * 4. Test
- */
-
 /**
  * Implementation of a B+ tree to allow efficient access to
  * many different indexes of a large data set. 
@@ -394,7 +381,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
                     for(int i = 0; i < keys.size(); ++i) {
                         if(keys.get(i).compareTo(key) < 0) {
                             if(i == (keys.size() - 1)) {
-                                rangeList.addAll(children.get(i).rangeSearch(key, comparator));
+                                rangeList.addAll(children.get(i + 1).rangeSearch(key, comparator));
                                 break;
                             }
                             else{
@@ -670,7 +657,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
             bpTree.insert(j, j);
             System.out.println("\n\nTree structure:\n" + bpTree.toString());
         }
-        List<Double> filteredValues = bpTree.rangeSearch(0.2d, ">=");
+        List<Double> filteredValues = bpTree.rangeSearch(0.8d, "==");
         System.out.println("Filtered values: " + filteredValues.toString());
 
     }
