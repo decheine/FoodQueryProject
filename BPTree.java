@@ -19,7 +19,6 @@ import java.util.Random;
  * 2. What does getFirstLeafKey do?
  * 3. Implement unimplemented methods
  * 4. Test
- * test comment 
  */
 
 /**
@@ -413,7 +412,8 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
                     for(int i = 0; i < keys.size(); ++i) {
                         if(keys.get(i).compareTo(key) < 0) {
                             if(i == (keys.size() - 1)) {
-                                rangeList.addAll(children.get(i).rangeSearch(key, comparator));
+                                System.out.println("fired");
+                                rangeList.addAll(children.get(i + 1).rangeSearch(key, comparator));
                                 break;
                             }
                             else{
@@ -425,14 +425,8 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
                             break;
                         }
                         else if(keys.get(i).compareTo(key) > 0) {
-                            if(i != 0) {
-                                rangeList.addAll(children.get(i - 1).rangeSearch(key, comparator));
-                                break;
-                            }
-                            else {
-                                rangeList.addAll(children.get(i).rangeSearch(key, comparator));
-                                break;
-                            }
+                            rangeList.addAll(children.get(i).rangeSearch(key, comparator));
+                            break;
                         }
                     }
                     break;
@@ -597,7 +591,6 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
             List<V> rangeList = new ArrayList<V>();
             
             for(int i = 0; i < keys.size(); ++i) {
-                System.out.println(keys.get(0));
                 switch (comparator) {
                     case "<=":
                         if(keys.get(i).compareTo(key) <= 0) {
@@ -677,7 +670,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
             bpTree.insert(j, j);
             System.out.println("\n\nTree structure:\n" + bpTree.toString());
         }
-        List<Double> filteredValues = bpTree.rangeSearch(0.2d, "==");
+        List<Double> filteredValues = bpTree.rangeSearch(0.2d, ">=");
         System.out.println("Filtered values: " + filteredValues.toString());
 
     }
