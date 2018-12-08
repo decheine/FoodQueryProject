@@ -1,0 +1,44 @@
+package application;
+
+import java.util.Collections;
+import javafx.scene.control.ListView;
+
+/**
+ * GUI representation of the list of food in FoodData
+ * 
+ * @author samlo
+ *
+ */
+public class FoodListView {
+    ListView<FoodItemView> list; // list of visible food items
+    
+    /**
+     * Constructor
+     */
+    public FoodListView() {
+        list = new ListView<FoodItemView>();
+    }
+    
+    /**
+     * Adds a new visible food item to the list
+     * 
+     * @param item - item to be added
+     */
+    public void addItem(FoodItemView item) {
+        // finds appropriate index for it to be inserted and maintain alphabetical order
+        int index = Collections.binarySearch(list.getItems(), item.getName());
+        
+        list.getItems().add(index, item);
+    }
+    
+    /**
+     * Returns a ListView of the visible food items
+     * 
+     * @return - ListView of visible food items
+     */
+    public ListView<FoodItemView> getList() {
+        return list;
+    }
+    
+    // TODO: add more functionality
+}
