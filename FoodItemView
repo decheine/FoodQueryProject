@@ -76,11 +76,11 @@ public class FoodItemView implements Comparable<String>{
         // TODO: find out what names will be in hashMap
         id = new Label("ID: " + foodItem.getID());
         name = new Label("Name: " + foodItem.getName());
-        cal = new Label("Calories: " + foodItem.getNutrientValue("Calories"));
-        fat = new Label("Fat: " + foodItem.getNutrientValue("Fat"));
-        carbs = new Label("Carbs: " + foodItem.getNutrientValue("Carbohydrates"));
-        fiber = new Label("Fiber: " + foodItem.getNutrientValue("Fiber"));
-        protein = new Label("Protein: " + foodItem.getNutrientValue("Protein"));
+        cal = new Label("Calories: " + foodItem.getNutrientValue("calories"));
+        fat = new Label("Fat: " + foodItem.getNutrientValue("fat"));
+        carbs = new Label("Carbs: " + foodItem.getNutrientValue("carbohydrates"));
+        fiber = new Label("Fiber: " + foodItem.getNutrientValue("fiber"));
+        protein = new Label("Protein: " + foodItem.getNutrientValue("protein"));
     }
     
     /**
@@ -102,13 +102,22 @@ public class FoodItemView implements Comparable<String>{
      * 
      * @return - true if box is ticked, false otherwise
      */
-    public boolean inMeal() {
+    public boolean getInMeal() {
         if(inMealBox.isSelected()) {
             return true;
         }
         else {
             return false;
         }
+    }
+    
+    /**
+     * Sets if item is in a meal.
+     * 
+     * @param inMeal
+     */
+    public void setNotInMeal() {
+        inMealBox.setSelected(false);
     }
     
     /**
@@ -134,7 +143,7 @@ public class FoodItemView implements Comparable<String>{
      */
     @Override
     public int compareTo(String name) {
-        return this.name.getText().compareTo(name);
+        return this.name.getText().toLowerCase().compareTo(name.toLowerCase());
     }
     
 }
