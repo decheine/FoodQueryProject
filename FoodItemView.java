@@ -15,7 +15,7 @@ import javafx.scene.layout.VBox;
  */
 public class FoodItemView implements Comparable<String>{
     FoodItem foodItem; // backend implementation of the food item
-    HBox itemBox; // wraps all components horizontally
+    VBox itemBox; // wraps all components vertically
     VBox nutrientBox; // wraps all nutrients vertically
     CheckBox inMealBox; // signifies if user desires to add the food item to the meal
     Label id; // id of food item
@@ -31,7 +31,7 @@ public class FoodItemView implements Comparable<String>{
      */
     public FoodItemView() {
         foodItem = null;
-        itemBox = new HBox();
+        itemBox = new VBox();
         itemBox.setPadding(new Insets(10, 10, 10, 10));
         
         nutrientBox = new VBox();
@@ -94,7 +94,7 @@ public class FoodItemView implements Comparable<String>{
      * Adds the nutrient box and check box in one location
      */
     private void constructItemBox() {
-        itemBox.getChildren().addAll(nutrientBox, inMealBox);
+        itemBox.getChildren().addAll(inMealBox, nutrientBox);
     }
     
     /**
@@ -125,7 +125,7 @@ public class FoodItemView implements Comparable<String>{
      * 
      * @return - itemBox containing all labels and boxes
      */
-    public HBox getItemBox() {
+    public VBox getItemBox() {
         return itemBox;
     }
     
