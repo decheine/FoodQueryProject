@@ -1,4 +1,5 @@
-package application;
+
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -181,6 +182,7 @@ public class FoodData implements FoodDataADT<FoodItem> {
     @Override
     public void saveFoodItems(String filename) {
         try {
+        	File file = new File(filename);
             PrintWriter out = new PrintWriter(new FileWriter(filename));
             for (FoodItem foodItem : this.nameSorted.rangeSearch("0", ">=")) {
                 String formatCSV = foodItem.getID() + "," + foodItem.getName() + "," + "calories"
