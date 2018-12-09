@@ -89,8 +89,31 @@ public class Main extends Application {
         Button addFoodItem = new Button("Add New Food Item");
         EventHandler<ActionEvent> addFoodItemEvent = new EventHandler<ActionEvent>() { 
             @Override
-            public void handle(ActionEvent event) {
-                AddFoodPopUp addFood = new AddFoodPopUp(window);
+            public void handle(ActionEvent e) {
+                Button submitButt = new Button("Submit");
+                Button cancelButt = new Button("Cancel");
+                AddFoodPopUp addFood = new AddFoodPopUp(window, submitButt, cancelButt);
+                
+                EventHandler<ActionEvent> submitEvent = new EventHandler<ActionEvent>() { 
+                    @Override
+                    public void handle(ActionEvent e2) {
+                        FoodItem item = addFood.getNewItem();
+
+                        foodData.addFoodItem(item);
+                        foodListView.addItem(new FoodItemView(item));
+                    } 
+                }; 
+                
+                submitButt.setOnAction(submitEvent);
+                
+                EventHandler<ActionEvent> cancelEvent = new EventHandler<ActionEvent>() { 
+                    @Override
+                    public void handle(ActionEvent e3) {
+                        addFood.closeWindow();
+                    } 
+                }; 
+                
+                cancelButt.setOnAction(cancelEvent);
             } 
         }; 
         
@@ -196,9 +219,7 @@ public class Main extends Application {
                 public void handle(ActionEvent e) 
                 { 
                     
-               foodListView.addCheckedItemsToMeal();
-
-                   
+                   // foodItem.addInAMeal();
                 } 
             }; 
             addToMealButt.setOnAction(addToMealEvent);
@@ -225,7 +246,8 @@ public class Main extends Application {
             EventHandler<ActionEvent> removeFromMealEvent = new EventHandler<ActionEvent>() { 
                 public void handle(ActionEvent e) 
                 { 
-                mealListView.removeCheckedItemsFromMeal();
+                 // if(cb1.isSelected())
+                   // foodItem.removeInAMeal();
                 } 
             }; 
             removeFromMealButt.setOnAction(removeFromMealEvent);
