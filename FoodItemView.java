@@ -146,4 +146,8 @@ public class FoodItemView implements Comparable<String>{
         return this.name.getText().toLowerCase().compareTo(name.toLowerCase());
     }
     
+    
+    public FoodItem getFoodItem() {
+        return foodItem;
+    }
 }
