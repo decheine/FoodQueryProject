@@ -1,6 +1,7 @@
 package application;
 
 import java.util.Collections;
+import java.util.List;
 import javafx.scene.control.ListView;
 
 /**
@@ -32,12 +33,59 @@ public class FoodListView {
     }
     
     /**
+     * Changes the food list view to represent the new list of food items
+     * 
+     * @param newList - new list to represent
+     */
+    public void newList(List<FoodItem> newList) {
+        this.list = new ListView<FoodItemView>();
+        
+        for(FoodItem item : newList) {
+            FoodItemView itemView = new FoodItemView(item);
+            addItem(itemView);
+        }
+        
+    }
+    
+    /**
      * Returns a ListView of the visible food items
      * 
      * @return - ListView of visible food items
      */
     public ListView<FoodItemView> getList() {
         return list;
+    }
+    
+    /**
+     * Returns a ListView of all FoodItemView objects whose check box is ticked. Unticks all ticked
+     * objects after they are added to the ListView.
+     * 
+     * @return - ListView of checked FoodItemView objects
+     */
+    public ListView<FoodItemView> addCheckedItemsToMeal() {
+        ListView<FoodItemView> mealListView = new ListView<FoodItemView>();
+        
+        for(FoodItemView item : list.getItems()) {
+            if(item.getInMeal()) {
+                mealListView.getItems().add(item);
+                item.setNotInMeal();
+            }
+        }
+        
+        return mealListView;
+    }
+    
+    /**
+     * Removes all checked items from the GUI representation of the list. (Used only for a meal).
+     * 
+     */
+    public void removeCheckedItemsFromMeal() {
+        for(FoodItemView item : list.getItems()) {
+            if(item.getInMeal()) {
+                list.getItems().remove(item);
+                item.setNotInMeal();
+            }
+        }
     }
     
     // TODO: add more functionality
