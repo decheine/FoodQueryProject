@@ -1,5 +1,4 @@
 package application;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -18,14 +17,20 @@ import java.util.Scanner;
  */
 public class FoodData implements FoodDataADT<FoodItem> {
     
-    // List of all the food items.
+    // list of all the food items.
     private List<FoodItem> foodItemList;
 
-    // Map of nutrients and their corresponding index
+    // map of nutrients and their corresponding index
     private HashMap<String, BPTree<Double, FoodItem>> indexes;
     
+    // a list of food items in the meal
     private List<FoodItem> mealList;
     
+    // a BPTree with food names as the key to sort foodItems
+    private BPTree<String, FoodItem> nameSorted;
+    
+    // branching factor of each of the BPTrees in indexes
+    private static final int BRANCHINGFACTOR = 3;
     
     /**
      * Public constructor
@@ -34,6 +39,13 @@ public class FoodData implements FoodDataADT<FoodItem> {
         foodItemList = new ArrayList<FoodItem>();
         indexes = new HashMap<String, BPTree<Double, FoodItem>>();
         mealList = new ArrayList<FoodItem>();
+        nameSorted = new BPTree<String, FoodItem>(BRANCHINGFACTOR);
+        
+        indexes.put("calories", new BPTree<Double, FoodItem>(BRANCHINGFACTOR));
+        indexes.put("fat", new BPTree<Double, FoodItem>(BRANCHINGFACTOR));
+        indexes.put("carbohydrates", new BPTree<Double, FoodItem>(BRANCHINGFACTOR));
+        indexes.put("fiber", new BPTree<Double, FoodItem>(BRANCHINGFACTOR));
+        indexes.put("protein", new BPTree<Double, FoodItem>(BRANCHINGFACTOR));
     }
     
     
@@ -86,16 +98,36 @@ public class FoodData implements FoodDataADT<FoodItem> {
             return;
         }
     }
+    
+    /**
+     * A public method that takes the entire food list and filters it down to a list of food items
+     * with matching names or querry arguments. This method just checks if the user wants to filter
+     * by name or nutrients or both based off their current text field inputs
+     * 
+     * @param name the food's name (if empty, no input name filters)
+     * @param a list of the querry filters (if length == 0 then no input querry args)
+     * @return List a list of food with filtered foods
+     */
+
+    public List<FoodItem> filter(String name, List<String> filters) {
+        if (name.equals("")) {
+            return filterByNutrients(filters);
+        }
+        if (filters.size() == 0) {
+            return filterByName(name);
+        }
+        return intersection(filterByNutrients(filters), filterByName(name));
+    }
 
     /*
      * (non-Javadoc)
      * @see skeleton.FoodDataADT#filterByName(java.lang.String)
      */
     @Override
-    public List<FoodItem> filterByName(String substring) {
+    public List<FoodItem> filterByName(String name) {
         List<FoodItem> matching = new ArrayList<FoodItem>();
         for (FoodItem fooditem : this.foodItemList) {
-            if (fooditem.getName().startsWith(substring)) { // TODO: changed to start with
+            if (fooditem.getName().toLowerCase().contains(name.toLowerCase())) {
                 matching.add(fooditem);
             }
         }
@@ -113,7 +145,7 @@ public class FoodData implements FoodDataADT<FoodItem> {
         for (String argument : rules) {
             if (valid(argument)) {
                 String[] args = argument.split(" ");
-                List<FoodItem> tempSet = indexes.get(args[0]).rangeSearch(Double.parseDouble(args[2]), (String) args[1]); // TODO: fixed
+                List<FoodItem> tempSet = indexes.get(args[0]).rangeSearch(Double.parseDouble(args[2]), (String) args[1]);
                 currSet = intersection(currSet, tempSet);
             } else {
                 System.out.println("invalid command: " + argument);
@@ -130,12 +162,14 @@ public class FoodData implements FoodDataADT<FoodItem> {
     public void addFoodItem(FoodItem foodItem) {
         this.foodItemList.add(foodItem); // add food item to the list
 
+        this.nameSorted.insert(foodItem.getName().toLowerCase(), foodItem);
+        
         // add each food to each of the bp tress
-        this.indexes.get("Calories").insert(foodItem.getNutrientValue("Calories"), foodItem);
-        this.indexes.get("Fat").insert(foodItem.getNutrientValue("Fat"), foodItem);
-        this.indexes.get("Carbohydrates").insert(foodItem.getNutrientValue("Carbohydrates"), foodItem);
-        this.indexes.get("Fiber").insert(foodItem.getNutrientValue("Fiber"), foodItem);
-        this.indexes.get("Protein").insert(foodItem.getNutrientValue("Protein"), foodItem);
+        this.indexes.get("calories").insert(foodItem.getNutrientValue("calories"), foodItem);
+        this.indexes.get("fat").insert(foodItem.getNutrientValue("fat"), foodItem);
+        this.indexes.get("carbohydrates").insert(foodItem.getNutrientValue("carbohydrates"), foodItem);
+        this.indexes.get("fiber").insert(foodItem.getNutrientValue("fiber"), foodItem);
+        this.indexes.get("protein").insert(foodItem.getNutrientValue("protein"), foodItem);
     }
 
     /*
@@ -203,5 +237,12 @@ public class FoodData implements FoodDataADT<FoodItem> {
             if (setB.contains(x))
                 tmp.add(x); // if in both sets, add to final set
         return tmp;
+    }
+    
+    /**
+     * @return - a list of food items sorted alphabetically by their name.
+     */
+    public List<FoodItem> getSortedList() {
+        return this.nameSorted.rangeSearch("", ">="); // TODO: smallest ascii character?
     }
 }
