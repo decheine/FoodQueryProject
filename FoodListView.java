@@ -71,25 +71,25 @@ public class FoodListView {
      * 
      * @return - ListView of checked FoodItemView objects
      */
-    public FoodListView getCheckedItems() {
-        FoodListView mealListView = new FoodListView();
-        
+    public void addCheckedItemsToMeal(FoodListView mealList) {
         for(FoodItemView item : itemList) {
             if(item.getInMeal()) {
-                mealListView.addItem(item);
+                FoodItemView tempItem = new FoodItemView(item.getFoodItem());
+                
+                System.out.println("fired0");
+                mealList.addItem(tempItem);
                 item.setNotInMeal();
             }
         }
-        
-        return mealListView;
     }
     
     /**
      * Removes all checked items from the GUI representation of the list. (Used only for a meal).
      * 
      */
-    public void removeCheckedItemsFromMeal() {
-        for(FoodItemView item : itemList) {
+    public void removeCheckedItems() {
+        for(int i = 0; i < itemList.size(); ++i) {
+            FoodItemView item = itemList.get(i);
             if(item.getInMeal()) {
                 itemList.remove(item);
                 list.getItems().remove(item.getItemBox());
@@ -97,6 +97,7 @@ public class FoodListView {
             }
         }
     }
-    
+
+    //public FoodItem
     // TODO: add more functionality
 }
