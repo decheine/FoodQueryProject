@@ -196,7 +196,13 @@ public class Main extends Application {
                 public void handle(ActionEvent e) 
                 { 
                     
-                   // foodItem.addInAMeal();
+                   for(int i=0; i<foodListView.getList().getItems().size();i++)
+                   {
+                	   FoodItemView item = foodListView.getList().getItems().get(i);
+                	   if(item.inMeal())
+                		   mealListView.addItem(item);
+                   }
+                   
                 } 
             }; 
             addToMealButt.setOnAction(addToMealEvent);
