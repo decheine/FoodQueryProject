@@ -59,10 +59,17 @@ public class SaveFile {
             	System.out.println("pressed");
                 System.out.println(entryField.getText());
                 save(entryField.getText()+".csv", foodData);
+            	dialog.close();
             	
             }
         };
+        EventHandler<ActionEvent> cancelButtonEvent = new EventHandler<ActionEvent>() {
+        	public void handle(ActionEvent e) {
+        		dialog.close();
+        	}
+        };
         submitButt.setOnAction(saveButtonEvent);
+        cancelButt.setOnAction(cancelButtonEvent);
 
         
         
@@ -72,7 +79,7 @@ public class SaveFile {
         //saveField.getChildren().addAll(saveLabel, textField);
         boxOfTexts.getChildren().addAll(saveBox, buttHBox);
         
-        Scene dialogScene = new Scene(boxOfTexts, 300, 300);
+        Scene dialogScene = new Scene(boxOfTexts, 300, 100);
         dialog.setScene(dialogScene);
         dialog.show();
     }
