@@ -98,6 +98,34 @@ public class FoodListView {
         }
     }
 
-    //public FoodItem
+    public List<Double> analyzeList() {
+        // 0 = calories, 1 = fat, 2 = carbohydrates, 3 = fiber, 4 = protein
+        ArrayList<Double> statList = new ArrayList<Double>();
+        
+        if(itemList == null || itemList.size() <= 0) {
+            return statList;
+        }
+        
+        for(FoodItemView itemView : itemList) {
+            FoodItem tempItem = itemView.getFoodItem();
+            
+            if(statList.size() >= 5) {
+                statList.set(0, (statList.get(0) + tempItem.getNutrientValue("calories")));
+                statList.set(1, (statList.get(1) + tempItem.getNutrientValue("fat")));
+                statList.set(2, (statList.get(2) + tempItem.getNutrientValue("carbohydrates")));
+                statList.set(3, (statList.get(3) + tempItem.getNutrientValue("fiber")));
+                statList.set(4, (statList.get(4) + tempItem.getNutrientValue("protein")));
+            }
+            else {
+                statList.add(tempItem.getNutrientValue("calories"));
+                statList.add(tempItem.getNutrientValue("fat"));
+                statList.add(tempItem.getNutrientValue("carbohydrates"));
+                statList.add(tempItem.getNutrientValue("fiber"));
+                statList.add(tempItem.getNutrientValue("protein"));
+            }
+        }
+        
+        return statList;
+    }
     // TODO: add more functionality
 }
