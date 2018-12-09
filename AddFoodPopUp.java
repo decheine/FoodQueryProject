@@ -80,7 +80,7 @@ public class AddFoodPopUp {
     /**
      * Returns the new food item created by the text field inputs after submit button is clicked
      */
-    public FoodItem getNewItem() {
+    public FoodItem getNewItem() throws NumberFormatException{
         String name = ((TextField) ((HBox) boxOfTexts.getChildren().get(0)).getChildren().get(1)).getText();
         String id = ((TextField) ((HBox) boxOfTexts.getChildren().get(6)).getChildren().get(1)).getText();;
         
@@ -102,7 +102,7 @@ public class AddFoodPopUp {
     }
     
     /**
-     * 
+     * Closes the window
      */
     public void closeWindow() {
         dialog.close();
