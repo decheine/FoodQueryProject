@@ -196,12 +196,8 @@ public class Main extends Application {
                 public void handle(ActionEvent e) 
                 { 
                     
-                   for(int i=0; i<foodListView.getList().getItems().size();i++)
-                   {
-                	   FoodItemView item = foodListView.getList().getItems().get(i);
-                	   if(item.inMeal())
-                		   mealListView.addItem(item);
-                   }
+               foodListView.addCheckedItemsToMeal();
+
                    
                 } 
             }; 
@@ -229,8 +225,7 @@ public class Main extends Application {
             EventHandler<ActionEvent> removeFromMealEvent = new EventHandler<ActionEvent>() { 
                 public void handle(ActionEvent e) 
                 { 
-                 // if(cb1.isSelected())
-                   // foodItem.removeInAMeal();
+                mealListView.removeCheckedItemsFromMeal();
                 } 
             }; 
             removeFromMealButt.setOnAction(removeFromMealEvent);
