@@ -23,9 +23,6 @@ public class FoodData implements FoodDataADT<FoodItem> {
     // map of nutrients and their corresponding index
     private HashMap<String, BPTree<Double, FoodItem>> indexes;
     
-    // a list of food items in the meal
-    private List<FoodItem> mealList;
-    
     // a BPTree with food names as the key to sort foodItems
     private BPTree<String, FoodItem> nameSorted;
     
@@ -38,7 +35,6 @@ public class FoodData implements FoodDataADT<FoodItem> {
     public FoodData() {
         foodItemList = new ArrayList<FoodItem>();
         indexes = new HashMap<String, BPTree<Double, FoodItem>>();
-        mealList = new ArrayList<FoodItem>();
         nameSorted = new BPTree<String, FoodItem>(BRANCHINGFACTOR);
         
         indexes.put("calories", new BPTree<Double, FoodItem>(BRANCHINGFACTOR));
@@ -186,7 +182,7 @@ public class FoodData implements FoodDataADT<FoodItem> {
     public void saveFoodItems(String filename) {
         try {
             PrintWriter out = new PrintWriter(new FileWriter(filename));
-            for (FoodItem foodItem : mealList) {
+            for (FoodItem foodItem : this.nameSorted.rangeSearch("0", ">=")) {
                 String formatCSV = foodItem.getID() + "," + foodItem.getName() + "," + "calories"
                     + "," + foodItem.getNutrientValue("calories") + "," + "fat" + ","
                     + foodItem.getNutrientValue("fat") + "," + "carbohydrate" + ","
