@@ -17,7 +17,7 @@ import java.io.IOException;
 /**
  * Creates a new window for allowing the input of a new food item's attributes.
  * 
- * @author samlo
+ * @author Nick Decheine
  *
  */
 public class SaveFile {
@@ -56,8 +56,7 @@ public class SaveFile {
             public void handle(ActionEvent e) {
             	// here is the action of the save button
             	// call 
-            	System.out.println("pressed");
-                System.out.println(entryField.getText());
+            	//System.out.println("pressed");
                 save(entryField.getText()+".csv", foodData);
             	dialog.close();
             	
