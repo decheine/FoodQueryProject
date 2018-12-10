@@ -1,5 +1,5 @@
-package application;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -9,108 +9,108 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
-
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+/**
+ * This class represents the backend for managing all 
+ * the operations associated with FoodItems
+ * 
+ * @author sapan (sapan@cs.wisc.edu)
+ */
 public class FoodData implements FoodDataADT<FoodItem> {
-
-    // List of all the food items.
+    
+    // list of all the food items.
     private List<FoodItem> foodItemList;
 
-    // Map of nutrients and their corresponding index
+    // map of nutrients and their corresponding index
     private HashMap<String, BPTree<Double, FoodItem>> indexes;
-
-    // A BPTree with food names as the key to sort foodItems
+    
+    // a BPTree with food names as the key to sort foodItems
     private BPTree<String, FoodItem> nameSorted;
-
+    
+    // branching factor of each of the BPTrees in indexes
+    private static final int BRANCHINGFACTOR = 3;
+    
     /**
-     * Public constructor will not really do anything however until a file is loaded
+     * Public constructor
      */
-    public FoodData() {}
-
-    /**
-     * A public method with a passed in file name that loads a csv file containing food data This
-     * method will load data and save it into various private data structures.
-     * 
-     * @param file the file's name
+    public FoodData() {
+        foodItemList = new ArrayList<FoodItem>();
+        indexes = new HashMap<String, BPTree<Double, FoodItem>>();
+        nameSorted = new BPTree<String, FoodItem>(BRANCHINGFACTOR);
+        indexes.put("calories", new BPTree<Double, FoodItem>(BRANCHINGFACTOR));
+        indexes.put("fat", new BPTree<Double, FoodItem>(BRANCHINGFACTOR));
+        indexes.put("carbohydrate", new BPTree<Double, FoodItem>(BRANCHINGFACTOR));
+        indexes.put("fiber", new BPTree<Double, FoodItem>(BRANCHINGFACTOR));
+        indexes.put("protein", new BPTree<Double, FoodItem>(BRANCHINGFACTOR));
+    }
+    
+    
+    /*
+     * (non-Javadoc)
+     * @see skeleton.FoodDataADT#loadFoodItems(java.lang.String)
      */
-
     @Override
-    public void loadFoodItems(String fileName) {
-
+    public void loadFoodItems(String filePath) {
         // Read the input stream from "fileName"
         FileInputStream fileString;
+        
+        // clear the current food
+        
         try {
-            fileString = new FileInputStream(fileName);
-            Scanner scan = new Scanner(fileString);
+            fileString = new FileInputStream(filePath);
+        } catch (FileNotFoundException e1) {
+        	//Path currentRelativePath = Paths.get("");
+        	//String s = currentRelativePath.toAbsolutePath().toString();
+        	//System.out.println("input path " + filePath);
+        	//System.out.println(System.getProperty("user.dir"));
+        	//Path path = FileSystems.getDefault().getPath(filePath);
+        	//System.out.println("path: " + path.toString());
+        	System.out.println("File not found.");
+            return;
+        }
+        Path path = FileSystems.getDefault().getPath(filePath);
+    	//System.out.println("path: " + path.toString());
+        
+        Scanner scan = new Scanner(fileString);
 
-            // Read each line of the file and place the split line array into an the wordList
-            // arrayList
-            while (scan.hasNextLine()) {
-                String[] food = scan.nextLine().split(",");
+        // Read each line of the file and place the split line array into an the wordList arrayList
+        while (scan.hasNextLine()) {
+            String[] foodFileArray = scan.nextLine().split(",");
+// TODO Implement a more rigorous check for the format of each line
+            if (foodFileArray.length == 12) { // check if correct number of args
+            	//System.out.println("correct args");
+                FoodItem item = new FoodItem(foodFileArray[0], foodFileArray[1]);
+                
+                item.addNutrient(foodFileArray[2], Double.parseDouble(foodFileArray[3]));
+                item.addNutrient(foodFileArray[4], Double.parseDouble(foodFileArray[5]));
+                item.addNutrient(foodFileArray[6], Double.parseDouble(foodFileArray[7]));
+                item.addNutrient(foodFileArray[8], Double.parseDouble(foodFileArray[9]));
+                item.addNutrient(foodFileArray[10], Double.parseDouble(foodFileArray[11]));
 
-                if (food.length == 12) { // check if correct number of args
-                    HashMap<String, Double> nutrients = new HashMap<String, Double>(); // construct
-                    nutrients.put(food[2], Double.parseDouble(food[3]));
-                    nutrients.put(food[4], Double.parseDouble(food[5])); // a nutrient hashmap
-                    nutrients.put(food[6], Double.parseDouble(food[7]));
-                    nutrients.put(food[8], Double.parseDouble(food[9]));
-                    nutrients.put(food[10], Double.parseDouble(food[11]));
-
-                    FoodItem newFood = new FoodItem(food[0], food[1], nutrients, false); // new food
-                                                                                         // item
-                                                                                         // created
-                    this.foodItemList.add(newFood); // add food item to the list
-                    this.nameSorted.insert(newFood.getName().toLowerCase(), newFood); // add food
-                                                                                      // item to
-                                                                                      // BPTree
-
-                    // add each food to each of the bp tree
-                    this.indexes.get(food[2]).insert(Double.parseDouble(food[3]), newFood);
-                    this.indexes.get(food[4]).insert(Double.parseDouble(food[5]), newFood);
-                    this.indexes.get(food[6]).insert(Double.parseDouble(food[7]), newFood);
-                    this.indexes.get(food[8]).insert(Double.parseDouble(food[9]), newFood);
-                    this.indexes.get(food[10]).insert(Double.parseDouble(food[11]), newFood);
-                }
+                this.foodItemList.add(item); // add food item to the list
+                
+                // add each food to each of the bp tress
+                this.indexes.get(foodFileArray[2]).insert(Double.parseDouble(foodFileArray[3]), item);
+                this.indexes.get(foodFileArray[4]).insert(Double.parseDouble(foodFileArray[5]), item);
+                this.indexes.get(foodFileArray[6]).insert(Double.parseDouble(foodFileArray[7]), item);
+                this.indexes.get(foodFileArray[8]).insert(Double.parseDouble(foodFileArray[9]), item);
+                this.indexes.get(foodFileArray[10]).insert(Double.parseDouble(foodFileArray[11]), item);
+                //actually add the food item
+                
             }
-            // Close the Scanner and InputStream
-            scan.close();
+        }
+        // Close the Scanner and InputStream
+        scan.close();
+        
+        try {
             fileString.close();
-        } catch (FileNotFoundException e) {
-            System.out.print("could not load food CSV file");
-            e.printStackTrace();
         } catch (IOException e) {
-            System.out.print("could not close food CSV file");
-            e.printStackTrace();
+            return;
         }
     }
-
-    /**
-     * A public method with a passed in file name that saves a csv file containing food data. This
-     * method will save the data stored in our total food list
-     * 
-     * @param file the file's name
-     */
-
-    @Override
-    public void saveFoodItems(String file) {
-        try {
-            PrintWriter out = new PrintWriter(new FileWriter(file));
-            for (FoodItem foodItem : this.nameSorted.rangeSearch("0", ">=")) {
-                String formatCSV = foodItem.getID() + "," + foodItem.getName() + "," + "calories"
-                    + "," + foodItem.getNutrientValue("calories") + "," + "fat" + ","
-                    + foodItem.getNutrientValue("fat") + "," + "carbohydrate" + ","
-                    + foodItem.getNutrientValue("carbohydrate") + "," + "fiber" + ","
-                    + foodItem.getNutrientValue("fiber") + "," + "protein" + ","
-                    + foodItem.getNutrientValue("protein");
-                out.println(formatCSV);
-            }
-            out.close();
-        } catch (FileNotFoundException ex) {
-            System.out.println("Unable to open file");
-        } catch (IOException ex) {
-            System.out.println("Error reading fiel");
-        }
-    }
-
+    
     /**
      * A public method that takes the entire food list and filters it down to a list of food items
      * with matching names or querry arguments. This method just checks if the user wants to filter
@@ -131,14 +131,10 @@ public class FoodData implements FoodDataADT<FoodItem> {
         return intersection(filterByNutrients(filters), filterByName(name));
     }
 
-    /**
-     * A public method that takes the entire food list and filters it down to a list of food items
-     * with matching names
-     * 
-     * @param name the food's name
-     * @return List a list of food with the filtered name
+    /*
+     * (non-Javadoc)
+     * @see skeleton.FoodDataADT#filterByName(java.lang.String)
      */
-
     @Override
     public List<FoodItem> filterByName(String name) {
         List<FoodItem> matching = new ArrayList<FoodItem>();
@@ -150,23 +146,18 @@ public class FoodData implements FoodDataADT<FoodItem> {
         return matching;
     }
 
-    /**
-     * A public method that takes the entire food list and filters it down to a list of food items
-     * that meet the input filter's requirements. This filters must first be decoded and then
-     * applied to the main food list and then each output will be intersected with each other
-     * leading to an overall list of FoodItem that meet all input arguments.
-     * 
-     * @param filters a list of filters
-     * @return List a list of food with the filter requirements met
+    /*
+     * (non-Javadoc)
+     * @see skeleton.FoodDataADT#filterByNutrients(java.util.List)
      */
-
-    public List<FoodItem> filterByNutrients(List<String> filters) {
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<FoodItem> filterByNutrients(List<String> rules) {
         List<FoodItem> currSet = this.foodItemList;
-        for (String argument : filters) {
+        for (String argument : rules) {
             if (valid(argument)) {
                 String[] args = argument.split(" ");
-                List<FoodItem> tempSet =
-                    indexes.get(args[0]).rangeSearch(Double.parseDouble(args[2]), args[1]);
+                List<FoodItem> tempSet = indexes.get(args[0]).rangeSearch(Double.parseDouble(args[2]), (String) args[1]);
                 currSet = intersection(currSet, tempSet);
             } else {
                 System.out.println("invalid command: " + argument);
@@ -175,23 +166,59 @@ public class FoodData implements FoodDataADT<FoodItem> {
         return currSet;
     }
 
-    /**
-     * A private helper method to find the set intersection of two food sets
-     * 
-     * @param ListA the sets to be intersected
-     * @param ListB
-     * @return tmp a list containing the intersect
+    /*
+     * (non-Javadoc)
+     * @see skeleton.FoodDataADT#addFoodItem(skeleton.FoodItem)
      */
+    @Override
+    public void addFoodItem(FoodItem foodItem) {
+        this.foodItemList.add(foodItem); // add food item to the list
 
-    private List<FoodItem> intersection(List<FoodItem> setA, List<FoodItem> setB) {
-        List<FoodItem> tmp = new ArrayList<FoodItem>();
-        for (FoodItem x : setA) // check if each element in one set is in the other
-            if (setB.contains(x))
-                tmp.add(x); // if in both sets, add to final set
-        return tmp;
+        this.nameSorted.insert(foodItem.getName().toLowerCase(), foodItem);
+        
+        // add each food to each of the bp tress
+        this.indexes.get("calories").insert(foodItem.getNutrientValue("calories"), foodItem);
+        this.indexes.get("fat").insert(foodItem.getNutrientValue("fat"), foodItem);
+        this.indexes.get("carbohydrate").insert(foodItem.getNutrientValue("carbohydrate"), foodItem);
+        this.indexes.get("fiber").insert(foodItem.getNutrientValue("fiber"), foodItem);
+        this.indexes.get("protein").insert(foodItem.getNutrientValue("protein"), foodItem);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see skeleton.FoodDataADT#getAllFoodItems()
+     */
+    @Override
+    public List<FoodItem> getAllFoodItems() {
+        return foodItemList;
+    }
 
+    // "carbohydrate" must be changed to "carbohydrate"
+    @Override
+    public void saveFoodItems(String filename) {
+        try {
+        	File file = new File(filename);
+            PrintWriter out = new PrintWriter(new FileWriter(filename));
+            System.out.println("fIL: "+foodItemList);
+			if (!foodItemList.isEmpty()) {
+				for (FoodItem foodItem : this.nameSorted.rangeSearch("0", ">=")) {
+					String formatCSV = foodItem.getID() + "," + foodItem.getName() + "," + "calories" + ","
+							+ foodItem.getNutrientValue("calories") + "," + "fat" + ","
+							+ foodItem.getNutrientValue("fat") + "," + "carbohydrate" + ","
+							+ foodItem.getNutrientValue("carbohydrate") + "," + "fiber" + ","
+							+ foodItem.getNutrientValue("fiber") + "," + "protein" + ","
+							+ foodItem.getNutrientValue("protein");
+					out.println(formatCSV);
+				}
+				out.close();
+			}
+        } catch (FileNotFoundException ex) {
+            System.out.println("Unable to open file");
+        } catch (IOException ex) {
+            System.out.println("Error reading file");
+        }
+    }
+    
     /**
      * A private helper method to check if a given input to the filterByNutrients is a valid
      * argument, it just checks formatting of the string. <nutrient> <comparator> <value>
@@ -199,7 +226,6 @@ public class FoodData implements FoodDataADT<FoodItem> {
      * @param argument
      * @return true if a valid argument
      */
-
     private boolean valid(String argument) {
         String[] theArgs = argument.split(" ");
         if (theArgs.length != 3) { // check if correct number of args
@@ -213,28 +239,26 @@ public class FoodData implements FoodDataADT<FoodItem> {
         }
         return true; // return true if all tests passed
     }
-
-
-    @Override
-    public void addFoodItem(FoodItem foodItem) {
-        this.foodItemList.add(foodItem);
-
-        this.nameSorted.insert(foodItem.getName().toLowerCase(), foodItem);
-        HashMap<String, Double> newtable = foodItem.getNutrients();
-        this.indexes.get("calories").insert(newtable.get("calories"), foodItem);
-        this.indexes.get("fat").insert(newtable.get("fat"), foodItem);
-        this.indexes.get("carbohydrate").insert(newtable.get("carbohydrate"), foodItem);
-        this.indexes.get("fiber").insert(newtable.get("fiber"), foodItem);
-        this.indexes.get("protein").insert(newtable.get("protein"), foodItem);
+    
+    /**
+     * A private helper method to find the set intersection of two food sets
+     * 
+     * @param ListA the sets to be intersected
+     * @param ListB
+     * @return tmp a list containing the intersect
+     */
+    private List<FoodItem> intersection(List<FoodItem> setA, List<FoodItem> setB) {
+        List<FoodItem> tmp = new ArrayList<FoodItem>();
+        for (FoodItem x : setA) // check if each element in one set is in the other
+            if (setB.contains(x))
+                tmp.add(x); // if in both sets, add to final set
+        return tmp;
     }
-
+    
+    /**
+     * @return - a list of food items sorted alphabetically by their name.
+     */
     public List<FoodItem> getSortedList() {
-        return this.nameSorted.rangeSearch("0", ">=");
-    }
-
-
-    @Override
-    public List<FoodItem> getAllFoodItems() {
-        return this.foodItemList;
+        return this.nameSorted.rangeSearch("", ">="); // TODO: smallest ascii character?
     }
 }
