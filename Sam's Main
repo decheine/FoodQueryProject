@@ -36,11 +36,13 @@ import javafx.event.EventHandler;
  *
  */
 public class Main extends Application {
-    Stage window; // the GUI stage
-    Scene scene; // the main GUI scene
-    FoodListView foodListView; // visible list of food items
-    FoodListView mealListView; // visible list of food items added to meal
-    FoodData foodData;
+    private Stage window; // the GUI stage
+    private Scene scene; // the main GUI scene
+    private FoodListView foodListView; // visible list of food items
+    private FoodListView mealListView; // visible list of food items added to meal
+    private FoodData foodData;
+    Label counterLabel;
+    int counter;
     
     public VBox getLeftPane() {
         // left side of the GUI window
@@ -97,10 +99,17 @@ public class Main extends Application {
                 EventHandler<ActionEvent> submitEvent = new EventHandler<ActionEvent>() { 
                     @Override
                     public void handle(ActionEvent e2) {
-                        FoodItem item = addFood.getNewItem();
-
-                        foodData.addFoodItem(item);
-                        foodListView.addItem(new FoodItemView(item));
+                        FoodItem item;
+                        
+                        try {
+                            item = addFood.getNewItem();
+                            foodData.addFoodItem(item);
+                            foodListView.addItem(new FoodItemView(item));
+                            counterLabel.setText("Number of Items: " + (++counter));
+                        }
+                        catch(NumberFormatException e) {
+                            // TODO: add something?
+                        }
                     } 
                 }; 
                 
@@ -123,7 +132,7 @@ public class Main extends Application {
             public void handle(ActionEvent e) 
             { 
                 
-              foodListView.newList(foodData.getAllFoodItems());   
+             //todo
             } 
         }; 
         
@@ -161,11 +170,7 @@ public class Main extends Application {
         EventHandler<ActionEvent> applyQueryEvent = new EventHandler<ActionEvent>() { 
             public void handle(ActionEvent e) 
             { 
-                String name = filterNameField.getAccessibleText();
-            	String temp = filterNutrientField.getText();
-            	String [] f2 = temp.split("\n");
-            	
-                foodListView.newList(foodData.filter(name, Arrays.asList(f2)));
+                
                
             } 
         }; 
@@ -215,14 +220,15 @@ public class Main extends Application {
             // food list labels and button
             Label foodListTitle = new Label("Food List");
             foodListTitle.setFont(Font.font("Arial", FontWeight.BOLD, 20));
-            Label counter = new Label("Number of Items: 6");
+            
+            counterLabel = new Label("Number of Items: " + counter);
             
             Button addToMealButt = new Button("Add Selected To Meal");
-             //unsure on how to add multiple checked food Items              
+            // unsure on how to add multiple checked food Items              
             EventHandler<ActionEvent> addToMealEvent = new EventHandler<ActionEvent>() { 
                 public void handle(ActionEvent e) 
                 { 
-                    foodListView.addCheckedItemsToMeal();
+                    foodListView.addCheckedItemsToMeal(mealListView);
                 } 
             }; 
             addToMealButt.setOnAction(addToMealEvent);
@@ -230,14 +236,12 @@ public class Main extends Application {
             // meal list labels and buttons
             Label mealListTitle = new Label("Meal List");
             mealListTitle.setFont(Font.font("Arial", FontWeight.BOLD, 20));
-            Label counter2 = new Label("Number of Items: 2");
 
             Button analyzeMealButt = new Button("Analyze Meal");
             EventHandler<ActionEvent>analyzeMealEvent = new EventHandler<ActionEvent>() { 
                 public void handle(ActionEvent e) 
                 { 
-                    
-                  
+                    AnalyzeMealPopUp analyzeMeal = new AnalyzeMealPopUp(window, mealListView.analyzeList());
                 } 
             }; 
             analyzeMealButt.setOnAction(analyzeMealEvent);
@@ -249,8 +253,7 @@ public class Main extends Application {
             EventHandler<ActionEvent> removeFromMealEvent = new EventHandler<ActionEvent>() { 
                 public void handle(ActionEvent e) 
                 { 
-                 mealListView.removeCheckedItemsFromMeal();
-                 
+                    mealListView.removeCheckedItems();
                 } 
             }; 
             removeFromMealButt.setOnAction(removeFromMealEvent);
@@ -263,14 +266,13 @@ public class Main extends Application {
             root.add(foodListTitle, 1, 0, 1, 1);
             root.add(foodListView.getList(), 1, 1, 2, 1);
             root.add(addToMealButt, 2, 0);
-            root.add(counter, 1, 2, 2, 1);
+            root.add(counterLabel, 1, 2, 2, 1);
             
             // adding meal list, its labels, and buttons to the right of the window
             root.add(mealListTitle, 3, 0, 1, 1);
             root.add(mealListView.getList(), 3, 1, 3, 1);
             root.add(analyzeMealButt, 4, 0, 1, 1);
             root.add(removeFromMealButt, 5, 0);
-            root.add(counter2, 3, 2, 2, 1);
 
             scene = new Scene(root, 875, 500);
             window.setScene(scene);
