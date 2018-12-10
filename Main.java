@@ -1,8 +1,10 @@
-import java.io.IOException;
+package application;
 
+import java.io.IOException;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -36,18 +38,11 @@ import javafx.event.EventHandler;
 public class Main extends Application {
     Stage window; // the GUI stage
     Scene scene; // the main GUI scene
-    ListView<HBox> foodListView; // visible list of food items
-    ListView<HBox> mealListView; // visible list of food items added to meal
-    String fileName=""; // temp variable just to for filler file name
-    FoodData foodData = new FoodData();
-    FoodItem foodItem = new FoodItem();
+    FoodListView foodListView; // visible list of food items
+    FoodListView mealListView; // visible list of food items added to meal
+    FoodData foodData;
     
-    /**
-     * Creates the left portion of the GUI window.
-     * 
-     * @return - VBox representing left portion
-     */
-    public VBox makeLeftPane() {
+    public VBox getLeftPane() {
         // left side of the GUI window
         VBox leftPaneOuter = new VBox(20);
 
@@ -63,12 +58,7 @@ public class Main extends Application {
         EventHandler<ActionEvent> loadEvent = new EventHandler<ActionEvent>() { 
             public void handle(ActionEvent e) 
             { 
-               
-                try {
-					foodData.loadFoodItems(fileName);
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
+                foodData.loadFoodItems(""); // TODO: change this
             } 
         }; 
         loadList.setOnAction(loadEvent);
@@ -89,22 +79,41 @@ public class Main extends Application {
             public void handle(ActionEvent e) 
             { 
                 
-               foodData.saveFoodItems(fileName);
+               foodData.saveFoodItems(""); // TODO: change this
             } 
         }; 
-        
         
         loadList.setOnAction(loadEvent);
         saveList.setOnAction(saveEvent);
         
-        
-        
         Button addFoodItem = new Button("Add New Food Item");
         EventHandler<ActionEvent> addFoodItemEvent = new EventHandler<ActionEvent>() { 
-            public void handle(ActionEvent e) 
-            { 
+            @Override
+            public void handle(ActionEvent e) {
+                Button submitButt = new Button("Submit");
+                Button cancelButt = new Button("Cancel");
+                AddFoodPopUp addFood = new AddFoodPopUp(window, submitButt, cancelButt);
                 
-               //todo
+                EventHandler<ActionEvent> submitEvent = new EventHandler<ActionEvent>() { 
+                    @Override
+                    public void handle(ActionEvent e2) {
+                        FoodItem item = addFood.getNewItem();
+
+                        foodData.addFoodItem(item);
+                        foodListView.addItem(new FoodItemView(item));
+                    } 
+                }; 
+                
+                submitButt.setOnAction(submitEvent);
+                
+                EventHandler<ActionEvent> cancelEvent = new EventHandler<ActionEvent>() { 
+                    @Override
+                    public void handle(ActionEvent e3) {
+                        addFood.closeWindow();
+                    } 
+                }; 
+                
+                cancelButt.setOnAction(cancelEvent);
             } 
         }; 
         
@@ -114,10 +123,11 @@ public class Main extends Application {
             public void handle(ActionEvent e) 
             { 
                 
-             //todo
+              foodListView.newList(foodData.getAllFoodItems());   
             } 
         }; 
-       addFoodItem.setOnAction(addFoodItemEvent);
+        
+        addFoodItem.setOnAction(addFoodItemEvent);
         showAllFoodItems.setOnAction(showAllFoodItemsEvent);
         
         // for spacing out items
@@ -151,7 +161,11 @@ public class Main extends Application {
         EventHandler<ActionEvent> applyQueryEvent = new EventHandler<ActionEvent>() { 
             public void handle(ActionEvent e) 
             { 
-                
+                String name = filterNameField.getAccessibleText();
+            	String temp = filterNutrientField.getText();
+            	String [] f2 = temp.split("\n");
+            	
+                foodListView.newList(foodData.filter(name, Arrays.asList(f2)));
                
             } 
         }; 
@@ -166,10 +180,11 @@ public class Main extends Application {
 
         // complete left portion of window
         leftPaneOuter.getChildren().addAll(topContainer, botContainer);
-
+        
         return leftPaneOuter;
     }
-
+    
+    
     /**
      * Creates a GUI
      * 
@@ -180,150 +195,11 @@ public class Main extends Application {
         try {
             window = primaryStage;
             window.setTitle("Food Query and Meal Analysis");
+            
+            foodData = new FoodData();
 
-            foodListView = new ListView<HBox>();
-
-            // The following is hard coded food items to be used for the development of the GUI
-            // for milestone 2 and does not reflect the final product
-            
-            HBox hbox; // contains a food item's vbox of qualities and a check box for selection
-            VBox vbox; // contains a food item's qualities
-            CheckBox cb1; // check box marking a food item as selected
-            Label foodName = new Label(); // the name of a food item
-            Label calories = new Label(); // the number of calories a food item has
-            Label fat = new Label(); // the amount of fat a food item has
-            Label carbs = new Label(); // the amount of carbs a food item has
-            Label fiber = new Label(); // the amount of fiber a food item has
-            Label protein = new Label(); // the amount of protein a food item has
-            Label id = new Label(); // the unique ID number of the food item
-            
-            // adds 6 food items to the food list
-            for(int i = 0; i < 7; ++i) {
-                hbox = new HBox();
-                hbox.setPadding(new Insets(10, 10, 10, 10));
-                
-                vbox = new VBox();
-                vbox.setPadding(new Insets(10, 10, 10, 10));
-                
-                cb1 = new CheckBox();
-                cb1.setText("Add to Meal");
-
-                // Hard coded switch statement for generating a list of food items
-                switch(i) {
-                    case 0 :
-                        foodName = new Label("Name: Banana");
-                        calories = new Label("Calories: 2");
-                        fat = new Label("Fat: 5g");
-                        carbs = new Label("Carbs: 5g");
-                        fiber = new Label("Fiber: 5g");
-                        protein = new Label("Protein: 5g");
-                        id = new Label("ID: 000000004");
-                        break;
-                    case 1 : 
-                        foodName = new Label("Name: Burger");
-                        calories = new Label("Calories: 1000");
-                        fat = new Label("Fat: 5g");
-                        carbs = new Label("Carbs: 5g");
-                        fiber = new Label("Fiber: 5g");
-                        protein = new Label("Protein: 5g");
-                        id = new Label("ID: 000000000");
-                        break;
-                    case 2 : 
-                        foodName = new Label("Name: Fries");
-                        calories = new Label("Calories: 2000");
-                        fat = new Label("Fat: 5g");
-                        carbs = new Label("Carbs: 5g");
-                        fiber = new Label("Fiber: 5g");
-                        protein = new Label("Protein: 5g");
-                        id = new Label("ID: 000000002");
-                        break;
-                    case 3 : 
-                        foodName = new Label("Name: Red Pepper");
-                        calories = new Label("Calories: 17");
-                        fat = new Label("Fat: 5g");
-                        carbs = new Label("Carbs: 5g");
-                        fiber = new Label("Fiber: 5g");
-                        protein = new Label("Protein: 5g");
-                        id = new Label("ID: 000000007");
-                        break;
-                    case 4 : 
-                        foodName = new Label("Name: Soda");
-                        calories = new Label("Calories: 10000");
-                        fat = new Label("Fat: 5g");
-                        carbs = new Label("Carbs: 5g");
-                        fiber = new Label("Fiber: 5g");
-                        protein = new Label("Protein: 5g");
-                        id = new Label("ID: 000000003");
-                        break;
-                    case 5 : 
-                        foodName = new Label("Name: Steak");
-                        calories = new Label("Calories: 2000");
-                        fat = new Label("Fat: 5g");
-                        carbs = new Label("Carbs: 5g");
-                        fiber = new Label("Fiber: 5g");
-                        protein = new Label("Protein: 5g");
-                        id = new Label("ID: 000000006");
-                        break;
-                    case 6 : 
-                        foodName = new Label("Name: Tomato");
-                        calories = new Label("Calories: 7");
-                        fat = new Label("Fat: 5g");
-                        carbs = new Label("Carbs: 5g");
-                        fiber = new Label("Fiber: 5g");
-                        protein = new Label("Protein: 5g");
-                        id = new Label("ID: 000000005");
-                        break;
-                }
-                
-                vbox.getChildren().addAll(foodName, calories, fat, carbs, fiber, protein, id);
-                
-                hbox.getChildren().addAll(vbox, cb1);
-                
-                foodListView.getItems().add(hbox);
-            }
-            
-            // does the same thing for the meal list
-            mealListView = new ListView<HBox>();
-            
-            for(int i = 0; i < 2; ++i) {
-                hbox = new HBox();
-                hbox.setPadding(new Insets(10, 10, 10, 10));
-                
-                vbox = new VBox();
-                vbox.setPadding(new Insets(10, 10, 10, 10));
-                
-                cb1 = new CheckBox();
-                cb1.setText("Remove From Meal");
-                
-                vbox.getChildren().add(cb1);
-                
-                switch(i) {
-                    case 0 :
-                        foodName = new Label("Name: Banana");
-                        calories = new Label("Calories: 2");
-                        fat = new Label("Fat: 5g");
-                        carbs = new Label("Carbs: 5g");
-                        fiber = new Label("Fiber: 5g");
-                        protein = new Label("Protein: 5g");
-                        id = new Label("ID: 000000004");
-                        break;
-                    case 1 : 
-                        foodName = new Label("Name: Burger");
-                        calories = new Label("Calories: 1000");
-                        fat = new Label("Fat: 5g");
-                        carbs = new Label("Carbs: 5g");
-                        fiber = new Label("Fiber: 5g");
-                        protein = new Label("Protein: 5g");
-                        id = new Label("ID: 000000000");
-                        break;
-                }
-                
-                vbox.getChildren().addAll(foodName, calories, fat, carbs, fiber, protein, id);
-                
-                hbox.getChildren().addAll(vbox, cb1);
-                
-                mealListView.getItems().add(hbox);
-            }
+            foodListView = new FoodListView();
+            mealListView = new FoodListView();
 
             // layout of GUI
             GridPane root = new GridPane();
@@ -346,8 +222,7 @@ public class Main extends Application {
             EventHandler<ActionEvent> addToMealEvent = new EventHandler<ActionEvent>() { 
                 public void handle(ActionEvent e) 
                 { 
-                    
-                   foodItem.addInAMeal();
+                    foodListView.addCheckedItemsToMeal();
                 } 
             }; 
             addToMealButt.setOnAction(addToMealEvent);
@@ -374,28 +249,25 @@ public class Main extends Application {
             EventHandler<ActionEvent> removeFromMealEvent = new EventHandler<ActionEvent>() { 
                 public void handle(ActionEvent e) 
                 { 
-                 // if(cb1.isSelected())
-                   foodItem.removeInAMeal();
+                 mealListView.removeCheckedItemsFromMeal();
+                 
                 } 
             }; 
             removeFromMealButt.setOnAction(removeFromMealEvent);
             
-            
-            
+            VBox leftPaneOuter = getLeftPane();
             root.add(labelTitle, 0, 0);
-
-            VBox leftBar = makeLeftPane();
-            root.add(leftBar, 0, 1);
+            root.add(leftPaneOuter, 0, 1);
 
             // adding food list, its labels, and button to the center of the window
             root.add(foodListTitle, 1, 0, 1, 1);
-            root.add(foodListView, 1, 1, 2, 1);
+            root.add(foodListView.getList(), 1, 1, 2, 1);
             root.add(addToMealButt, 2, 0);
             root.add(counter, 1, 2, 2, 1);
             
             // adding meal list, its labels, and buttons to the right of the window
             root.add(mealListTitle, 3, 0, 1, 1);
-            root.add(mealListView, 3, 1, 3, 1);
+            root.add(mealListView.getList(), 3, 1, 3, 1);
             root.add(analyzeMealButt, 4, 0, 1, 1);
             root.add(removeFromMealButt, 5, 0);
             root.add(counter2, 3, 2, 2, 1);
