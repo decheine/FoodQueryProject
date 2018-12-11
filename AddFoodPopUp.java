@@ -93,7 +93,7 @@ public class AddFoodPopUp {
         item = new FoodItem(id, name);
         item.addNutrient("calories", cal);
         item.addNutrient("fat", fat);
-        item.addNutrient("carbohydrates", carbs);
+        item.addNutrient("carbohydrate", carbs);
         item.addNutrient("fiber", fiber);
         item.addNutrient("protein", protein);
         
