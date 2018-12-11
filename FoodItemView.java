@@ -78,7 +78,7 @@ public class FoodItemView implements Comparable<String>{
         name = new Label("Name: " + foodItem.getName());
         cal = new Label("Calories: " + foodItem.getNutrientValue("calories"));
         fat = new Label("Fat: " + foodItem.getNutrientValue("fat"));
-        carbs = new Label("Carbs: " + foodItem.getNutrientValue("carbohydrates"));
+        carbs = new Label("Carbs: " + foodItem.getNutrientValue("carbohydrate"));
         fiber = new Label("Fiber: " + foodItem.getNutrientValue("fiber"));
         protein = new Label("Protein: " + foodItem.getNutrientValue("protein"));
     }
