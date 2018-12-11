@@ -1,31 +1,18 @@
 package application;
 
-import java.io.IOException;
+import java.util.Arrays;
 import javafx.application.Application;
 import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.ScrollPane.ScrollBarPolicy;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
 import javafx.event.ActionEvent; 
 import javafx.event.EventHandler;
 
@@ -57,18 +44,20 @@ public class Main extends Application {
         Button loadList = new Button("Load New Food List");
         
         //loadList event handler
-        EventHandler<ActionEvent> loadEvent = new EventHandler<ActionEvent>() { 
-            public void handle(ActionEvent e) 
-            { 
-                foodData.loadFoodItems(""); // TODO: change this
-            } 
-        }; 
-        loadList.setOnAction(loadEvent);
-        
-        
         TextField csvFileInput = new TextField();
         csvFileInput.setPromptText("<file name>.csv");
         
+        EventHandler<ActionEvent> loadEvent = new EventHandler<ActionEvent>() { 
+            public void handle(ActionEvent e) 
+            { 
+                foodData.loadFoodItems(csvFileInput.getText()); // TODO: test
+                foodListView.newList(foodData.getAllFoodItems());
+                counter = foodData.getAllFoodItems().size();
+                counterLabel.setText("Number of Items: " + counter);
+            } 
+        }; 
+        loadList.setOnAction(loadEvent);
+
         Label inputFileLabel = new Label("Input Food List File:");
         
         fileInputBox.getChildren().addAll(inputFileLabel, csvFileInput, loadList);
@@ -80,8 +69,7 @@ public class Main extends Application {
         EventHandler<ActionEvent> saveEvent = new EventHandler<ActionEvent>() { 
             public void handle(ActionEvent e) 
             { 
-                
-               foodData.saveFoodItems(""); // TODO: change this
+                SaveFile fileWindow = new SaveFile(window, foodData); // TODO: test            
             } 
         }; 
         
@@ -131,8 +119,7 @@ public class Main extends Application {
         EventHandler<ActionEvent> showAllFoodItemsEvent = new EventHandler<ActionEvent>() { 
             public void handle(ActionEvent e) 
             { 
-                
-             //todo
+                foodListView.newList(foodData.getAllFoodItems()); // TODO: test
             } 
         }; 
         
@@ -170,8 +157,11 @@ public class Main extends Application {
         EventHandler<ActionEvent> applyQueryEvent = new EventHandler<ActionEvent>() { 
             public void handle(ActionEvent e) 
             { 
+                String name = filterNameField.getText();
+                String temp = filterNutrientField.getText();
+                String [] f2 = temp.split("\n");
                 
-               
+                foodListView.newList(foodData.filter(name, Arrays.asList(f2)));
             } 
         }; 
         applyQueryButt.setOnAction(applyQueryEvent);
