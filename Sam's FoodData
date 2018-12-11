@@ -1,5 +1,4 @@
-
-import java.io.File;
+package application;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -40,7 +39,7 @@ public class FoodData implements FoodDataADT<FoodItem> {
         
         indexes.put("calories", new BPTree<Double, FoodItem>(BRANCHINGFACTOR));
         indexes.put("fat", new BPTree<Double, FoodItem>(BRANCHINGFACTOR));
-        indexes.put("carbohydrates", new BPTree<Double, FoodItem>(BRANCHINGFACTOR));
+        indexes.put("carbohydrate", new BPTree<Double, FoodItem>(BRANCHINGFACTOR));
         indexes.put("fiber", new BPTree<Double, FoodItem>(BRANCHINGFACTOR));
         indexes.put("protein", new BPTree<Double, FoodItem>(BRANCHINGFACTOR));
     }
@@ -110,8 +109,17 @@ public class FoodData implements FoodDataADT<FoodItem> {
         if (name.equals("")) {
             return filterByNutrients(filters);
         }
-        if (filters.size() == 0) {
-            return filterByName(name);
+        if (filters.size() <= 1) {
+            try {
+                if(filters.get(0).equals("")) {
+                    List<FoodItem> list = filterByName(name);
+                    System.out.println(list.size());
+                    return list;
+                }
+            }
+            catch(Exception e) {
+                // TODO
+            }
         }
         return intersection(filterByNutrients(filters), filterByName(name));
     }
@@ -124,7 +132,7 @@ public class FoodData implements FoodDataADT<FoodItem> {
     public List<FoodItem> filterByName(String name) {
         List<FoodItem> matching = new ArrayList<FoodItem>();
         for (FoodItem fooditem : this.foodItemList) {
-            if (fooditem.getName().toLowerCase().contains(name.toLowerCase())) {
+            if (fooditem.getName().contains(name)) { // TODO: fixed
                 matching.add(fooditem);
             }
         }
@@ -145,7 +153,7 @@ public class FoodData implements FoodDataADT<FoodItem> {
                 List<FoodItem> tempSet = indexes.get(args[0]).rangeSearch(Double.parseDouble(args[2]), (String) args[1]);
                 currSet = intersection(currSet, tempSet);
             } else {
-                System.out.println("invalid command: " + argument);
+               // System.out.println("invalid command: " + argument); TODO: different output?
             }
         }
         return currSet;
@@ -164,7 +172,7 @@ public class FoodData implements FoodDataADT<FoodItem> {
         // add each food to each of the bp tress
         this.indexes.get("calories").insert(foodItem.getNutrientValue("calories"), foodItem);
         this.indexes.get("fat").insert(foodItem.getNutrientValue("fat"), foodItem);
-        this.indexes.get("carbohydrates").insert(foodItem.getNutrientValue("carbohydrates"), foodItem);
+        this.indexes.get("carbohydrate").insert(foodItem.getNutrientValue("carbohydrate"), foodItem);
         this.indexes.get("fiber").insert(foodItem.getNutrientValue("fiber"), foodItem);
         this.indexes.get("protein").insert(foodItem.getNutrientValue("protein"), foodItem);
     }
@@ -182,7 +190,6 @@ public class FoodData implements FoodDataADT<FoodItem> {
     @Override
     public void saveFoodItems(String filename) {
         try {
-        	File file = new File(filename);
             PrintWriter out = new PrintWriter(new FileWriter(filename));
             for (FoodItem foodItem : this.nameSorted.rangeSearch("0", ">=")) {
                 String formatCSV = foodItem.getID() + "," + foodItem.getName() + "," + "calories"
@@ -213,10 +220,10 @@ public class FoodData implements FoodDataADT<FoodItem> {
         if (theArgs.length != 3) { // check if correct number of args
             return false;
         }
-        if (theArgs[1] != ">" && theArgs[1] != ">=" && theArgs[1] != "<=" && theArgs[1] != "<") {
+        if (!(theArgs[1].equals(">=")) && !(theArgs[1].equals("<=")) && !(theArgs[1].equals("=="))) {
             return false; // check if valid comparator
         }
-        if (indexes.containsKey(theArgs[0].toLowerCase())) { // check if a valid nutrient
+        if (!(indexes.containsKey(theArgs[0].toLowerCase()))) { // check if a valid nutrient
             return false;
         }
         return true; // return true if all tests passed
