@@ -48,12 +48,12 @@ public class FoodListView {
      */
     public void newList(List<FoodItem> newList) {
         this.itemList = new ArrayList<FoodItemView>();
+        this.list.getItems().clear();
         
         for(FoodItem item : newList) {
             FoodItemView itemView = new FoodItemView(item);
             addItem(itemView);
         }
-        
     }
     
     /**
@@ -75,8 +75,6 @@ public class FoodListView {
         for(FoodItemView item : itemList) {
             if(item.getInMeal()) {
                 FoodItemView tempItem = new FoodItemView(item.getFoodItem());
-                
-                System.out.println("fired0");
                 mealList.addItem(tempItem);
                 item.setNotInMeal();
             }
@@ -88,12 +86,18 @@ public class FoodListView {
      * 
      */
     public void removeCheckedItems() {
-        for(int i = 0; i < itemList.size(); ++i) {
+        int size = itemList.size();
+
+        System.out.println(size);
+        
+        for(int i = 0; i < size; ++i) {
+            System.out.println("fired");
             FoodItemView item = itemList.get(i);
             if(item.getInMeal()) {
-                itemList.remove(item);
                 list.getItems().remove(item.getItemBox());
-                item.setNotInMeal();
+                itemList.remove(item);
+                --size;
+                --i;
             }
         }
     }
@@ -112,14 +116,14 @@ public class FoodListView {
             if(statList.size() >= 5) {
                 statList.set(0, (statList.get(0) + tempItem.getNutrientValue("calories")));
                 statList.set(1, (statList.get(1) + tempItem.getNutrientValue("fat")));
-                statList.set(2, (statList.get(2) + tempItem.getNutrientValue("carbohydrates")));
+                statList.set(2, (statList.get(2) + tempItem.getNutrientValue("carbohydrate")));
                 statList.set(3, (statList.get(3) + tempItem.getNutrientValue("fiber")));
                 statList.set(4, (statList.get(4) + tempItem.getNutrientValue("protein")));
             }
             else {
                 statList.add(tempItem.getNutrientValue("calories"));
                 statList.add(tempItem.getNutrientValue("fat"));
-                statList.add(tempItem.getNutrientValue("carbohydrates"));
+                statList.add(tempItem.getNutrientValue("carbohydrate"));
                 statList.add(tempItem.getNutrientValue("fiber"));
                 statList.add(tempItem.getNutrientValue("protein"));
             }
