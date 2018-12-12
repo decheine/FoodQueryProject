@@ -1,6 +1,24 @@
+/**
+ * Filename:   BPTree.java
+ * Project:    Final Project
+ * Authors:    Sapan, Samuel Locke
+ *
+ * Semester:   Fall 2018
+ * Course:     CS400
+ * Lecture:    002
+ * 
+ * Due Date:   Before 10pm on December 12, 2018
+ * Version:    1.0
+ * 
+ * Credits:    None
+ * 
+ * Bugs:       None
+ */
+
+package application;
+
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -17,7 +35,7 @@ import java.util.Random;
  * due to the ability to perform log_m N lookups and
  * linear in-order traversals of the data items.
  * 
- * @author sapan (sapan@cs.wisc.edu)
+ * @author sapan (sapan@cs.wisc.edu), Samuel Locke
  *
  * @param <K> key - expect a string that is the type of id for each item
  * @param <V> value - expect a user-defined type that stores all data for a food item
@@ -35,7 +53,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
     /**
      * Public constructor
      * 
-     * @param branchingFactor 
+     * @param branchingFactor = the number of children nodes for internal nodes of the tree
      */
     public BPTree(int branchingFactor) {
         if (branchingFactor <= 2) {
@@ -100,6 +118,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
      * @param value - value to be inserted
      * @param node - current node being inspected
      */
+    @SuppressWarnings("unchecked")
     private void insertHelper(K key, V value, Node node) {
         int index = Collections.binarySearch(node.keys, key);
         
@@ -157,12 +176,14 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
     public List<V> rangeSearch(K key, String comparator) {
         if (!comparator.contentEquals(">=") && 
             !comparator.contentEquals("==") && 
-            !comparator.contentEquals("<=") )
+            !comparator.contentEquals("<="))
             return new ArrayList<V>();
         
         ArrayList<V> rangeList = new ArrayList<V>();
-        
-        rangeList.addAll(root.rangeSearch(key, comparator));
+
+        if(root != null) {
+            rangeList.addAll(root.rangeSearch(key, comparator));
+        }
 
         return rangeList;
     }
@@ -172,6 +193,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
      * This method is provided to students in the implementation.
      * @return a string representation
      */
+    @SuppressWarnings("unchecked")
     @Override
     public String toString() {
         Queue<List<Node>> queue = new LinkedList<List<Node>>();
@@ -219,6 +241,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * Package constructor
          */
         Node() {
+            @SuppressWarnings("unused")
             List<K> keys = new ArrayList<K>();
         }
         
@@ -269,7 +292,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
      * and provides implementation of the operations
      * required for internal (non-leaf) nodes.
      * 
-     * @author sapan
+     * @author sapan, Samuel Locke
      */
     private class InternalNode extends Node {
 
@@ -450,7 +473,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
      * and provides implementation of the operations that
      * required for leaf nodes.
      * 
-     * @author sapan
+     * @author sapan, Samuel Locke
      */
     private class LeafNode extends Node {
         
@@ -461,6 +484,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         LeafNode next;
         
         // Reference to the previous leaf node
+        @SuppressWarnings("unused")
         LeafNode previous;
         
         /**
@@ -646,7 +670,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
      * 
      * @param args
      */
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         // create empty BPTree with branching factor of 3
         BPTree<Double, Double> bpTree = new BPTree<>(3);
 
@@ -672,6 +696,6 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         List<Double> filteredValues = bpTree.rangeSearch(0.2d, ">=");
         System.out.println("Filtered values: " + filteredValues.toString());
 
-    }
+    }*/
 
 } // End of class BPTree
