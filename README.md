@@ -1,8 +1,15 @@
 # FoodQueryProject
-CS400 Final Project
+Team of 4
 
-## TASKS
-Individual tasks that can/should be completed independent of others
-- Filtering algorithm ( also decide which class to use when handling the list of Food objects)
-  Some filtering implementations using ObservableList(?) in recent lecture 11/28
-- File input and output reading, with respective file formating for this project
+## Team Members:
+Daniel Koch
+email: dkoch5@wisc.edu
+
+Samuel Locke
+email: slocke3@wisc.edu
+
+Niranjan Achanta
+email: achanta2@wisc.edu
+
+Nicholas A. Decheinie
+email: decheine@wisc.edu
