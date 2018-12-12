@@ -1,6 +1,25 @@
+/**
+ * Filename:   Main.java
+ * Project:    Final Project
+ * Authors:    Samuel Locke, Niru Achanta
+ *
+ * Semester:   Fall 2018
+ * Course:     CS400
+ * Lecture:    002
+ * 
+ * Due Date:   Before 10pm on December 12, 2018
+ * Version:    1.0
+ * 
+ * Credits:    None
+ * 
+ * Bugs:       None
+ */
+
 package application;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.stage.Stage;
@@ -19,18 +38,23 @@ import javafx.event.EventHandler;
 /**
  * Creates the basic GUI for Food Query and Meal Analysis
  * 
- * @author Samuel Locke
- *
+ * @author Samuel Locke, Niru Achanta
  */
 public class Main extends Application {
     private Stage window; // the GUI stage
     private Scene scene; // the main GUI scene
     private FoodListView foodListView; // visible list of food items
     private FoodListView mealListView; // visible list of food items added to meal
-    private FoodData foodData;
-    Label counterLabel;
-    int counter;
+    private FoodDataADT<FoodItem> foodData; // Contains all added food items
+    private Label counterLabel; // Label of how many food items have been added
+    private int counter; // Number of food items added
     
+    /**
+     * Creates the menu for the program, allowing for loading a new file, saving to a file, adding
+     * a singular food item, applying filters, and disabling filters.
+     * 
+     * @return - a VBox containing the menu interface for the program
+     */
     public VBox getLeftPane() {
         // left side of the GUI window
         VBox leftPaneOuter = new VBox(20);
@@ -41,49 +65,63 @@ public class Main extends Application {
         // Vbox containing a label, button, and text field related to file input
         VBox fileInputBox = new VBox(5);
         
-        Button loadList = new Button("Load New Food List");
         
-        //loadList event handler
+        // Start of loading a new file section
+        Label inputFileLabel = new Label("Input Food List File:");
+        
+        // Button for loading a file
+        Button loadList = new Button("Load New Food List");
+
+        // Field for user input for a file to load
         TextField csvFileInput = new TextField();
         csvFileInput.setPromptText("<file name>.csv");
         
+        // Event when loadList button is clicked
         EventHandler<ActionEvent> loadEvent = new EventHandler<ActionEvent>() { 
             public void handle(ActionEvent e) 
             { 
-                foodData.loadFoodItems(csvFileInput.getText()); // TODO: test
+                foodData.loadFoodItems(csvFileInput.getText());
                 foodListView.newList(foodData.getAllFoodItems());
                 counter = foodData.getAllFoodItems().size();
                 counterLabel.setText("Number of Items: " + counter);
             } 
-        }; 
+        };
         loadList.setOnAction(loadEvent);
 
-        Label inputFileLabel = new Label("Input Food List File:");
-        
         fileInputBox.getChildren().addAll(inputFileLabel, csvFileInput, loadList);
+        // End of loading a new file section
         
-        // menu buttons for functionality
+        
+        // Start of menu button section
+        
+        // button for saving the current food list to a given file
         Button saveList = new Button("Save Food List");
-        
-        
+       
+        // when saveList is clicked
         EventHandler<ActionEvent> saveEvent = new EventHandler<ActionEvent>() { 
             public void handle(ActionEvent e) 
             { 
-                SaveFile fileWindow = new SaveFile(window, foodData); // TODO: test            
+                @SuppressWarnings("unused")
+                // creates a window to input a file name where the food list will be save to
+                SaveFile fileWindow = new SaveFile(window, foodData);     
             } 
-        }; 
-        
-        loadList.setOnAction(loadEvent);
+        };
         saveList.setOnAction(saveEvent);
         
+        // button for adding a new food item
         Button addFoodItem = new Button("Add New Food Item");
+        
+        // when addFoodItem is clicked
         EventHandler<ActionEvent> addFoodItemEvent = new EventHandler<ActionEvent>() { 
             @Override
             public void handle(ActionEvent e) {
-                Button submitButt = new Button("Submit");
-                Button cancelButt = new Button("Cancel");
+                Button submitButt = new Button("Submit"); // button for submitting new food item
+                Button cancelButt = new Button("Cancel"); // button for canceling submission
+                
+                // new window displaying entry fields for the item's nutrient values
                 AddFoodPopUp addFood = new AddFoodPopUp(window, submitButt, cancelButt);
                 
+                // when submitButt is clicked
                 EventHandler<ActionEvent> submitEvent = new EventHandler<ActionEvent>() { 
                     @Override
                     public void handle(ActionEvent e2) {
@@ -96,43 +134,46 @@ public class Main extends Application {
                             counterLabel.setText("Number of Items: " + (++counter));
                         }
                         catch(NumberFormatException e) {
-                            // TODO: add something?
+                            // Do nothing
                         }
                     } 
                 }; 
-                
                 submitButt.setOnAction(submitEvent);
                 
+                // when cancelButt is clicked
                 EventHandler<ActionEvent> cancelEvent = new EventHandler<ActionEvent>() { 
                     @Override
                     public void handle(ActionEvent e3) {
                         addFood.closeWindow();
                     } 
                 }; 
-                
                 cancelButt.setOnAction(cancelEvent);
             } 
-        }; 
+        };
+        addFoodItem.setOnAction(addFoodItemEvent);
         
-             
+        // button for disabling all currently operating filters on the food list
         Button showAllFoodItems = new Button("Show All Food Items (Reset Filters)");
+        
+        // when showAllFoodItems is clicked
         EventHandler<ActionEvent> showAllFoodItemsEvent = new EventHandler<ActionEvent>() { 
             public void handle(ActionEvent e) 
             { 
-                foodListView.newList(foodData.getAllFoodItems()); // TODO: test
+                foodListView.newList(foodData.getAllFoodItems());
             } 
         }; 
-        
-        addFoodItem.setOnAction(addFoodItemEvent);
         showAllFoodItems.setOnAction(showAllFoodItemsEvent);
         
         // for spacing out items
         Label spacer0 = new Label("");
         spacer0.setFont(Font.font("Arial", FontWeight.NORMAL, 5));
         
-        // add items to the top vbox
+        // add items to the menu button vbox
         topContainer.getChildren().addAll(fileInputBox, spacer0, saveList, addFoodItem, showAllFoodItems);
-
+        // End of menu button section
+        
+        
+        // Start of filter section
         
         // bottom portion of the left side
         VBox botContainer = new VBox(5);
@@ -149,19 +190,44 @@ public class Main extends Application {
         // nutrient filter label and text area, allowing for multiple filters
         Label nutrientFilterLabel = new Label("Nutrient Filter: ");
         TextArea filterNutrientField = new TextArea();
-        filterNutrientField.setPromptText("<nutrient> <comparator> <value>");
-        filterNutrientField.setPrefWidth(220);
+        filterNutrientField.setPromptText("<nutrient> <comparator> <value> "
+            + "<nutrient> <comparator> <value>"
+            + "       ...");
+        filterNutrientField.setPrefWidth(230);
         
         // applies both kinds of filters
         Button applyQueryButt = new Button("Apply Query");
+        
+        // when applyQueryButt is clicked
         EventHandler<ActionEvent> applyQueryEvent = new EventHandler<ActionEvent>() { 
             public void handle(ActionEvent e) 
             { 
-                String name = filterNameField.getText();
-                String temp = filterNutrientField.getText();
-                String [] f2 = temp.split("\n");
+                String name = filterNameField.getText(); // name filter
+                String temp = filterNutrientField.getText(); // string of nutrient filters
+                String [] arrayOfRules = temp.split("\n"); // array of nutrient filters
+                List<String> rules = Arrays.asList(arrayOfRules); // list of nutrient filters
+                List<FoodItem> filterList; // list of food items that meet the filter criteria
                 
-                foodListView.newList(foodData.filter(name, Arrays.asList(f2)));
+                try {
+                    if(name.equals("")) {
+                        if(!(rules.get(0).equals(""))) {
+                            filterList = foodData.filterByNutrients(rules);
+                            foodListView.newList(filterList);
+                        }
+                        
+                        // Else do nothing since both fields are empty
+                    }
+                    else if(rules.get(0).equals("")) {
+                        filterList = foodData.filterByName(name);
+                        foodListView.newList(filterList);
+                    }
+                    else {
+                        filterList = intersection(foodData.filterByNutrients(rules), foodData.filterByName(name));
+                        foodListView.newList(filterList);
+                    }
+                } catch(Exception exception) {
+                    // Just do nothing
+                }
             } 
         }; 
         applyQueryButt.setOnAction(applyQueryEvent);
@@ -172,16 +238,35 @@ public class Main extends Application {
 
         // add items to bottom vbox
         botContainer.getChildren().addAll(queryLabel, filterLabel, filterNameField, spacer, nutrientFilterLabel, filterNutrientField, applyQueryButt);
-
+        // End of filter section
+        
+        
         // complete left portion of window
         leftPaneOuter.getChildren().addAll(topContainer, botContainer);
         
         return leftPaneOuter;
     }
     
+    /**
+     * A private helper method to find the set intersection of two food sets
+     * 
+     * @param ListA the sets to be intersected
+     * @param ListB
+     * @return tmp a list containing the intersect
+     */
+    private List<FoodItem> intersection(List<FoodItem> setA, List<FoodItem> setB) {
+        List<FoodItem> tmp = new ArrayList<FoodItem>();
+        for (FoodItem x : setA) // check if each element in one set is in the other
+            if (setB.contains(x))
+                tmp.add(x); // if in both sets, add to final set
+        return tmp;
+    }
+    
     
     /**
-     * Creates a GUI
+     * Creates a window representing the program's interface. Displays a food list and meal list
+     * and allows food items to be added to both. Also possess a menu on the left side and the 
+     * ability to analyze a meal's nutritional value.
      * 
      * @param primaryStage - stage for the GUI
      */
@@ -213,8 +298,10 @@ public class Main extends Application {
             
             counterLabel = new Label("Number of Items: " + counter);
             
+            // for adding a food item in the food list to the meal list
             Button addToMealButt = new Button("Add Selected To Meal");
-            // unsure on how to add multiple checked food Items              
+            
+            // when addToMealButt is clicked           
             EventHandler<ActionEvent> addToMealEvent = new EventHandler<ActionEvent>() { 
                 public void handle(ActionEvent e) 
                 { 
@@ -227,19 +314,24 @@ public class Main extends Application {
             Label mealListTitle = new Label("Meal List");
             mealListTitle.setFont(Font.font("Arial", FontWeight.BOLD, 20));
 
+            // for analyzing a meal's nutritional values
             Button analyzeMealButt = new Button("Analyze Meal");
+            
+            // when analyzeMealButt is clicked
             EventHandler<ActionEvent>analyzeMealEvent = new EventHandler<ActionEvent>() { 
                 public void handle(ActionEvent e) 
                 { 
+                    @SuppressWarnings("unused")
+                    // generates a window displaying the meal's values
                     AnalyzeMealPopUp analyzeMeal = new AnalyzeMealPopUp(window, mealListView.analyzeList());
                 } 
             }; 
             analyzeMealButt.setOnAction(analyzeMealEvent);
             
-            
-            
+            // for removing selected food items from the meal
             Button removeFromMealButt = new Button("Remove Selected From Meal");
 
+            // when removeFromMealButt is clicked
             EventHandler<ActionEvent> removeFromMealEvent = new EventHandler<ActionEvent>() { 
                 public void handle(ActionEvent e) 
                 { 
@@ -248,6 +340,7 @@ public class Main extends Application {
             }; 
             removeFromMealButt.setOnAction(removeFromMealEvent);
             
+            // menu of program
             VBox leftPaneOuter = getLeftPane();
             root.add(labelTitle, 0, 0);
             root.add(leftPaneOuter, 0, 1);
