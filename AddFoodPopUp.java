@@ -1,7 +1,22 @@
+/**
+ * Filename:   AddFoodPopUp.java
+ * Project:    Final Project
+ * Authors:    Samuel Locke
+ *
+ * Semester:   Fall 2018
+ * Course:     CS400
+ * Lecture:    002
+ * 
+ * Due Date:   Before 10pm on December 12, 2018
+ * Version:    1.0
+ * 
+ * Credits:    None
+ * 
+ * Bugs:       None
+ */
+
 package application;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -15,17 +30,15 @@ import javafx.stage.Stage;
 /**
  * Creates a new window for allowing the input of a new food item's attributes.
  * 
- * @author samlo
- *
+ * @author Samuel Locke
  */
 public class AddFoodPopUp {
     private final Stage dialog; // stage for this window
     private VBox boxOfTexts; // contains all the input fields
     private FoodItem item; // the food item to be created
-    private EventHandler<ActionEvent> e;
     
     /**
-     * Constructor
+     * Public constructor
      * 
      * @param primaryStage - the primary stage the program is running on
      */
@@ -84,11 +97,16 @@ public class AddFoodPopUp {
         String name = ((TextField) ((HBox) boxOfTexts.getChildren().get(0)).getChildren().get(1)).getText();
         String id = ((TextField) ((HBox) boxOfTexts.getChildren().get(6)).getChildren().get(1)).getText();;
         
+        // Sets the nutrient values of the new food item to the inputed values
         Double cal = Double.parseDouble(((TextField) ((HBox) boxOfTexts.getChildren().get(1)).getChildren().get(1)).getText());
         Double fat = Double.parseDouble(((TextField) ((HBox) boxOfTexts.getChildren().get(2)).getChildren().get(1)).getText());
         Double carbs = Double.parseDouble(((TextField) ((HBox) boxOfTexts.getChildren().get(3)).getChildren().get(1)).getText());
         Double fiber = Double.parseDouble(((TextField) ((HBox) boxOfTexts.getChildren().get(4)).getChildren().get(1)).getText());
         Double protein = Double.parseDouble(((TextField) ((HBox) boxOfTexts.getChildren().get(5)).getChildren().get(1)).getText());
+        
+        if((cal < 0) || (fat < 0) || (carbs < 0) || (fiber < 0) || (protein < 0)) {
+            throw new NumberFormatException();
+        }
         
         item = new FoodItem(id, name);
         item.addNutrient("calories", cal);
