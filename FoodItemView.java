@@ -1,33 +1,49 @@
+/**
+ * Filename:   FoodItemView.java
+ * Project:    Final Project
+ * Authors:    Samuel Locke
+ *
+ * Semester:   Fall 2018
+ * Course:     CS400
+ * Lecture:    002
+ * 
+ * Due Date:   Before 10pm on December 12, 2018
+ * Version:    1.0
+ * 
+ * Credits:    None
+ * 
+ * Bugs:       None
+ */
+
 package application;
 
 import javafx.geometry.Insets;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 /**
  * A GUI representation of a food item. Allows the user to tick a checkbox signifying their desire
- * to add the item to the meal.
+ * to add the item to the meal. Has a VBox that lists its nutrient values and whether it has been
+ * selected or not.
  * 
- * @author samlo
- *
+ * @author Samuel Locke
  */
 public class FoodItemView implements Comparable<String>{
-    FoodItem foodItem; // backend implementation of the food item
-    VBox itemBox; // wraps all components vertically
-    VBox nutrientBox; // wraps all nutrients vertically
-    CheckBox inMealBox; // signifies if user desires to add the food item to the meal
-    Label id; // id of food item
-    Label name; // name of food item
-    Label cal; // calories of food item
-    Label fat; // fat of food item
-    Label carbs; // carbohydrates of food item
-    Label fiber; // fiber of food item
-    Label protein; // protein of food item
+    private FoodItem foodItem; // backend implementation of the food item
+    private VBox itemBox; // wraps all components vertically
+    private VBox nutrientBox; // wraps all nutrients vertically
+    private CheckBox inMealBox; // signifies if user desires to add the food item to the meal
+    private Label id; // id of food item
+    private Label name; // name of food item
+    private Label cal; // calories of food item
+    private Label fat; // fat of food item
+    private Label carbs; // carbohydrates of food item
+    private Label fiber; // fiber of food item
+    private Label protein; // protein of food item
     
     /**
-     * Constructor
+     * Public constructor
      */
     public FoodItemView() {
         foodItem = null;
@@ -38,13 +54,13 @@ public class FoodItemView implements Comparable<String>{
         nutrientBox.setPadding(new Insets(10, 10, 10, 10));
         
         inMealBox = new CheckBox();
-        inMealBox.setText("Add to Meal");
+        inMealBox.setText("Select Item");
         
         setNutrients();
     }
     
     /**
-     * Constructor that corresponds to a given backend food item
+     * Constructor that corresponds to a given food item
      * @param foodItem - food item to be made into a visible representation
      */
     public FoodItemView(FoodItem foodItem) {
@@ -58,7 +74,7 @@ public class FoodItemView implements Comparable<String>{
     }
     
     /**
-     * Creates labels for the nutrients of the backend food item
+     * Creates labels for the nutrients of the food item
      */
     private void setNutrients() {
         if(foodItem == null) {
@@ -73,7 +89,6 @@ public class FoodItemView implements Comparable<String>{
             return;
         }
         
-        // TODO: find out what names will be in hashMap
         id = new Label("ID: " + foodItem.getID());
         name = new Label("Name: " + foodItem.getName());
         cal = new Label("Calories: " + foodItem.getNutrientValue("calories"));
@@ -146,7 +161,9 @@ public class FoodItemView implements Comparable<String>{
         return this.name.getText().toLowerCase().compareTo(name.toLowerCase());
     }
     
-    
+    /**
+     * @return - the food item this FoodItemView is representing.
+     */
     public FoodItem getFoodItem() {
         return foodItem;
     }
