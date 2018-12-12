@@ -1,3 +1,20 @@
+/**
+ * Filename:   FoodListView.java
+ * Project:    Final Project
+ * Authors:    Samuel Locke
+ *
+ * Semester:   Fall 2018
+ * Course:     CS400
+ * Lecture:    002
+ * 
+ * Due Date:   Before 10pm on December 12, 2018
+ * Version:    1.0
+ * 
+ * Credits:    None
+ * 
+ * Bugs:       None
+ */
+
 package application;
 
 import java.util.ArrayList;
@@ -7,17 +24,21 @@ import javafx.scene.control.ListView;
 import javafx.scene.layout.VBox;
 
 /**
- * GUI representation of the list of food in FoodData
+ * Provies functionality for a GUI representation of the list of food items added to the program
  * 
- * @author samlo
+ * @author Sam Locke
  *
  */
 public class FoodListView {
-    ListView<VBox> list; // list of visible food items
-    ArrayList<FoodItemView> itemList;
+    private ListView<VBox> list; // contains a VBox for each food item that lists its properties 
+                                 // along with a checkbox for it to be selected and added to a meal
+    
+    private ArrayList<FoodItemView> itemList; // Backend functionality of the food item 
+                                              // representation, allows for checking if a food item 
+                                              // has been selected
     
     /**
-     * Constructor
+     * Public constructor
      */
     public FoodListView() {
         list = new ListView<VBox>();
@@ -25,7 +46,8 @@ public class FoodListView {
     }
     
     /**
-     * Adds a new visible food item to the list
+     * Adds a new visible food item to the list, along with its backend, functional representation
+     * to the item list
      * 
      * @param item - item to be added
      */
@@ -33,6 +55,8 @@ public class FoodListView {
         // finds appropriate index for it to be inserted and maintain alphabetical order
         int index = Collections.binarySearch(itemList, item.getName());
         
+        // Collections.binarySearch returns (-index - 1) when item is not in list and index is 
+        // where the key would have been
         if(index < 0) { 
             index = ((-1 * index) - 1);
         }
@@ -47,8 +71,13 @@ public class FoodListView {
      * @param newList - new list to represent
      */
     public void newList(List<FoodItem> newList) {
-        this.itemList = new ArrayList<FoodItemView>();
+        if(newList == null) {
+            return;
+        }
+        
+        // this.itemList = new ArrayList<FoodItemView>();
         this.list.getItems().clear();
+        this.itemList.clear();
         
         for(FoodItem item : newList) {
             FoodItemView itemView = new FoodItemView(item);
@@ -66,10 +95,10 @@ public class FoodListView {
     }
     
     /**
-     * Returns a ListView of all FoodItemView objects whose check box is ticked. Unticks all ticked
-     * objects after they are added to the ListView.
+     * Adds all ticked FoodItemView objects in this FoodListView to a passed in FoodListView. 
+     * Unticks all ticked objects after they are added to the passed in FoodListView.
      * 
-     * @return - ListView of checked FoodItemView objects
+     * @return - FoodListView of checked FoodItemView objects
      */
     public void addCheckedItemsToMeal(FoodListView mealList) {
         for(FoodItemView item : itemList) {
@@ -82,16 +111,12 @@ public class FoodListView {
     }
     
     /**
-     * Removes all checked items from the GUI representation of the list. (Used only for a meal).
-     * 
+     * Removes all checked items from the GUI representation of the list
      */
     public void removeCheckedItems() {
         int size = itemList.size();
 
-        System.out.println(size);
-        
         for(int i = 0; i < size; ++i) {
-            System.out.println("fired");
             FoodItemView item = itemList.get(i);
             if(item.getInMeal()) {
                 list.getItems().remove(item.getItemBox());
@@ -102,6 +127,9 @@ public class FoodListView {
         }
     }
 
+    /**
+     * @return - a list of the combined nutrient values of the food items in this FoodListView
+     */
     public List<Double> analyzeList() {
         // 0 = calories, 1 = fat, 2 = carbohydrates, 3 = fiber, 4 = protein
         ArrayList<Double> statList = new ArrayList<Double>();
@@ -131,5 +159,4 @@ public class FoodListView {
         
         return statList;
     }
-    // TODO: add more functionality
 }
