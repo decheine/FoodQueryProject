@@ -1,13 +1,28 @@
+/**
+ * Filename:   FoodItem.java
+ * Project:    Final Project
+ * Authors:    aka, Daniel Koch, Samuel Locke
+ *
+ * Semester:   Fall 2018
+ * Course:     CS400
+ * Lecture:    002
+ * 
+ * Due Date:   Before 10pm on December 12, 2018
+ * Version:    1.0
+ * 
+ * Credits:    None
+ * 
+ * Bugs:       None
+ */
+
 package application;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * This class represents a food item with all its properties.
  * 
- * @author aka
+ * @author aka, Daniel Koch, Samuel Locke
  */
 public class FoodItem {
     // The name of the food item.
@@ -62,6 +77,10 @@ public class FoodItem {
      * If nutrient already exists, updates its value.
      */
     public void addNutrient(String name, double value) {
+        if(value < 0) {
+            throw new IllegalArgumentException();
+        }
+        
         nutrients.put(name, value);
     }
 
