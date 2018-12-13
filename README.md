@@ -1,6 +1,6 @@
-# FoodQueryProject
+# Food Query Project
 Team of 4
-x-team number:
+D-team number: 74
 
 ## Team Members:
 Daniel Koch
