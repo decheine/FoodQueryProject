@@ -1,5 +1,5 @@
 # Food Query Project
-Team of 4
+Team of 4\n
 D-team number: 74
 
 ## Team Members:
