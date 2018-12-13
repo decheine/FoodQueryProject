@@ -12,5 +12,5 @@ email: slocke3@wisc.edu
 Niranjan Achanta
 email: achanta2@wisc.edu
 
-Nicholas A. Decheinie
+Nicholas A. Decheine
 email: decheine@wisc.edu
